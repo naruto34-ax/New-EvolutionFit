@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Evolution Fit — Plataforma de Entrenamiento</title>
+  <link rel="icon" type="image/png" href="logoe.png.ico"/>
+  <link rel="stylesheet" href="css/styles.css"/>
+  <link rel="stylesheet" href="css/pages.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <div id="app">
+    <!-- PANTALLA DE CARGA -->
+    <div id="splash-screen" class="splash-screen">
+      <div class="splash-content">
+        <div class="splash-logo">
+          <img src="logoe.png.ico" alt="Evolution Fit" style="width:90px;height:90px;object-fit:contain;border-radius:50%"/>
+          <span>Evolution<strong>Fit</strong></span>
+        </div>
+        <div class="splash-bar"><div class="splash-progress"></div></div>
+        <p>Cargando tu experiencia fitness...</p>
+      </div>
+    </div>
+
+    <!-- NAVBAR -->
+    <nav id="navbar" class="navbar hidden" role="navigation" aria-label="Navegación principal">
+      <div class="nav-brand" onclick="navigate('dashboard')" role="link" tabindex="0" aria-label="Evolution Fit - Ir al inicio">
+        <img src="logoe.png.ico" alt="Evolution Fit Logo" class="nav-logo"/>
+        <span>Evolution<strong>Fit</strong></span>
+      </div>
+      <!-- Navbar usuario normal -->
+      <div class="nav-links hidden" id="nav-links-user" role="menubar">
+        <a href="#" onclick="navigate('dashboard')" class="nav-link" role="menuitem"><i class="fas fa-home" aria-hidden="true"></i> Inicio</a>
+        <a href="#" onclick="navigate('routines')" class="nav-link" role="menuitem"><i class="fas fa-dumbbell" aria-hidden="true"></i> Rutinas</a>
+        <a href="#" onclick="navigate('nutrition')" class="nav-link" role="menuitem"><i class="fas fa-apple-alt" aria-hidden="true"></i> Nutrición</a>
+        <a href="#" onclick="navigate('progress')" class="nav-link" role="menuitem"><i class="fas fa-chart-line" aria-hidden="true"></i> Progreso</a>
+        <a href="#" onclick="navigate('gamification')" class="nav-link" role="menuitem"><i class="fas fa-trophy" aria-hidden="true"></i> Logros</a>
+        <a href="#" onclick="navigate('store')" class="nav-link" role="menuitem"><i class="fas fa-shopping-bag" aria-hidden="true"></i> Tienda</a>
+        <a href="#" onclick="navigate('learn')" class="nav-link" role="menuitem"><i class="fas fa-book-open" aria-hidden="true"></i> Aprende</a>
+        <a href="#" onclick="navigate('coach')" class="nav-link" role="menuitem"><i class="fas fa-user-tie" aria-hidden="true"></i> Mi Coach</a>
+      </div>
+      <!-- Navbar coach -->
+      <div class="nav-links hidden" id="nav-links-coach" role="menubar">
+        <a href="#" onclick="navigate('dashboard')" class="nav-link" role="menuitem"><i class="fas fa-home" aria-hidden="true"></i> Inicio</a>
+        <a href="#" onclick="navigate('coach')" class="nav-link" role="menuitem"><i class="fas fa-users" aria-hidden="true"></i> Mis Clientes</a>
+        <a href="#" onclick="navigate('routines')" class="nav-link" role="menuitem"><i class="fas fa-dumbbell" aria-hidden="true"></i> Rutinas</a>
+        <a href="#" onclick="navigate('progress')" class="nav-link" role="menuitem"><i class="fas fa-chart-line" aria-hidden="true"></i> Progreso</a>
+        <a href="#" onclick="navigate('nutrition')" class="nav-link" role="menuitem"><i class="fas fa-apple-alt" aria-hidden="true"></i> Nutrición</a>
+        <a href="#" onclick="navigate('learn')" class="nav-link" role="menuitem"><i class="fas fa-book-open" aria-hidden="true"></i> Aprende</a>
+      </div>
+      <!-- Navbar admin -->
+      <div class="nav-links hidden" id="nav-links-admin" role="menubar">
+        <a href="#" onclick="navigate('dashboard')" class="nav-link" role="menuitem"><i class="fas fa-home" aria-hidden="true"></i> Inicio</a>
+        <a href="#" onclick="navigate('admin')" class="nav-link" role="menuitem"><i class="fas fa-cog" aria-hidden="true"></i> Gestión</a>
+        <a href="#" onclick="navigate('routines')" class="nav-link" role="menuitem"><i class="fas fa-dumbbell" aria-hidden="true"></i> Rutinas</a>
+        <a href="#" onclick="navigate('store')" class="nav-link" role="menuitem"><i class="fas fa-shopping-bag" aria-hidden="true"></i> Tienda</a>
+        <a href="#" onclick="navigate('coach')" class="nav-link" role="menuitem"><i class="fas fa-user-tie" aria-hidden="true"></i> Coaches</a>
+        <a href="#" onclick="navigate('learn')" class="nav-link" role="menuitem"><i class="fas fa-book-open" aria-hidden="true"></i> Aprende</a>
+      </div>
+      <div class="nav-user" id="nav-user">
+        <div class="nav-notifications" onclick="toggleNotifications()" role="button" tabindex="0" aria-label="Ver notificaciones">
+          <i class="fas fa-bell" aria-hidden="true"></i>
+          <span class="notif-badge" id="notif-badge" aria-label="notificaciones sin leer">3</span>
+        </div>
+        <div class="nav-avatar" onclick="navigate('profile')" role="button" tabindex="0" aria-label="Ver mi perfil">
+          <img id="nav-avatar-img" src="" alt="Mi avatar"/>
+          <span id="nav-username"></span>
+        </div>
+        <button class="btn-logout" onclick="logout()" aria-label="Cerrar sesión"><i class="fas fa-sign-out-alt" aria-hidden="true"></i></button>
+      </div>
+      <button class="nav-toggle" onclick="toggleMobileMenu()" aria-label="Abrir menú de navegación" aria-expanded="false">
+        <i class="fas fa-bars" aria-hidden="true"></i>
+      </button>
+    </nav>
+
+    <!-- PANEL DE NOTIFICACIONES -->
+    <div id="notifications-panel" class="notifications-panel hidden">
+      <div class="notif-header"><h3>Notificaciones</h3><button onclick="toggleNotifications()"><i class="fas fa-times"></i></button></div>
+      <div id="notif-list" class="notif-list"></div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <main id="main-content" class="main-content hidden"></main>
+
+    <!-- FOOTER -->
+    <footer id="app-footer" class="app-footer hidden">
+      <div class="footer-content">
+        <div class="footer-brand">
+          <img src="logoe.png.ico" alt="Evolution Fit" style="width:40px;height:40px;object-fit:contain;border-radius:50%"/>
+          <span>Evolution<strong>Fit</strong></span>
+          <p>Tu plataforma de entrenamiento personalizado</p>
+        </div>
+        <div class="footer-links">
+          <h4>Plataforma</h4>
+          <a href="#" onclick="navigate('routines')">Rutinas</a>
+          <a href="#" onclick="navigate('nutrition')">Nutrición</a>
+          <a href="#" onclick="navigate('progress')">Progreso</a>
+          <a href="#" onclick="navigate('store')">Tienda</a>
+        </div>
+        <div class="footer-links">
+          <h4>Espacios</h4>
+          <a href="#" onclick="filterBySpace('gym')">Gimnasio</a>
+          <a href="#" onclick="filterBySpace('park')">Parque</a>
+          <a href="#" onclick="filterBySpace('home')">Casa</a>
+        </div>
+        <div class="footer-links">
+          <h4>Soporte</h4>
+          <a href="#" onclick="navigate('coach')">Contactar Coach</a>
+          <a href="#">Términos de uso</a>
+          <a href="#">Privacidad</a>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>© 2025 Evolution Fit — Tecnológico de Antioquia · Ingeniería de Software · Cuarto Semestre</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/db.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/pages/landing.js"></script>
+  <script src="js/pages/login.js"></script>
+  <script src="js/pages/register.js"></script>
+  <script src="js/pages/dashboard.js"></script>
+  <script src="js/pages/routines.js"></script>
+  <script src="js/pages/nutrition.js"></script>
+  <script src="js/pages/progress.js"></script>
+  <script src="js/pages/gamification.js"></script>
+  <script src="js/pages/store.js"></script>
+  <script src="js/pages/coach.js"></script>
+  <script src="js/pages/admin.js"></script>
+  <script src="js/pages/profile.js"></script>
+  <script src="js/pages/learn.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
