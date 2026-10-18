@@ -119,17 +119,21 @@ export default function AdminOrders() {
                     <td style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                       {new Date(o.createdAt).toLocaleDateString('es-CO')}
                     </td>
-                    <td style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
-                      {nextStatuses(o.status).length === 0 && <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>—</span>}
-                      {nextStatuses(o.status).map((next) => (
-                        <button
-                          key={next}
-                          className={`btn btn-sm ${next === 'cancelled' ? 'btn-danger' : 'btn-success'}`}
-                          onClick={() => handleChange(o, next)}
-                        >
-                          {ORDER_STATUS[next].action}
-                        </button>
-                      ))}
+                    <td>
+                      <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                        {nextStatuses(o.status).length === 0 && (
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>—</span>
+                        )}
+                        {nextStatuses(o.status).map((next) => (
+                          <button
+                            key={next}
+                            className={`btn btn-sm ${next === 'cancelled' ? 'btn-danger' : 'btn-success'}`}
+                            onClick={() => handleChange(o, next)}
+                          >
+                            {ORDER_STATUS[next].action}
+                          </button>
+                        ))}
+                      </div>
                     </td>
                   </tr>
                 ))}

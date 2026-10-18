@@ -53,7 +53,7 @@ const { user } = useAuth();
   return (
     <CartProvider key={user.id} userId={user.id}>
       <div id="app">
-        <main id="main-content" className="main-content">
+        <main id="main-content" className="main-content" style={{ paddingBottom: import.meta.env.DEV ? '4rem' : undefined }}>
           <Routes>
             <Route path="/" element={<Navigate to="/tienda" replace />} />
             <Route path="/tienda" element={<Store />} />
