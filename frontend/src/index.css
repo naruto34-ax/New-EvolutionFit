@@ -1,0 +1,77 @@
+
+.welcome-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #101827, #1c3440);
+  color: #ffffff;
+  font-family: inherit;
+}
+
+.welcome-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 40px 32px;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.07);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.welcome-logo {
+  width: 76px;
+  height: 76px;
+  object-fit: contain;
+}
+
+.welcome-eyebrow {
+  margin-top: 16px;
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: #61e6a7;
+}
+
+.welcome-card h1 {
+  margin: 12px 0;
+  font-size: clamp(26px, 5vw, 36px);
+}
+
+.welcome-card > p {
+  line-height: 1.6;
+}
+
+.welcome-user-info {
+  margin: 28px 0;
+  padding: 16px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.welcome-user-info p {
+  margin: 10px 0;
+}
+
+.welcome-message {
+  color: #c8d8d2;
+}
+
+.welcome-logout {
+  width: 100%;
+  margin-top: 16px;
+  padding: 13px 18px;
+  border: none;
+  border-radius: 10px;
+  background: #61e6a7;
+  color: #10251d;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.welcome-logout:hover {
+  filter: brightness(0.94);
+}
