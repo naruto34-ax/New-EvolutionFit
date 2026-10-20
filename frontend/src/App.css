@@ -1,0 +1,337 @@
+
+/* ===== ESTILOS GENERALES ===== */
+:root {
+  font-family: Inter, system-ui, Arial, sans-serif;
+  color: #f4f7fb;
+  background: #0b1020;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+
+  --ef-bg: #0b1020;
+  --ef-card: #151d31;
+  --ef-border: #2b3650;
+  --ef-primary: #8b5cf6;
+  --ef-primary-hover: #7542e8;
+  --ef-text: #f4f7fb;
+  --ef-muted: #a8b3c7;
+  --ef-danger: #f87171;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse at top, #1b2140 0%, transparent 55%),
+    var(--ef-bg);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 3px;
+}
+
+/* ===== BIENVENIDA Y AUTENTICACIÓN ===== */
+.welcome-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 18px;
+}
+
+.welcome-card {
+  width: 100%;
+  max-width: 520px;
+  padding: 38px;
+  border: 1px solid var(--ef-border);
+  border-radius: 24px;
+  background: rgba(21, 29, 49, 0.94);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.3);
+  text-align: center;
+}
+
+.welcome-logo {
+  display: block;
+  width: 92px;
+  height: 92px;
+  object-fit: contain;
+  margin: 0 auto 14px;
+}
+
+.welcome-eyebrow {
+  color: #a78bfa;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 3px;
+}
+
+.welcome-card h1,
+.welcome-page h1 {
+  margin: 12px 0;
+  font-size: clamp(28px, 5vw, 38px);
+  line-height: 1.2;
+}
+
+.welcome-card > p,
+.welcome-page > p {
+  color: var(--ef-muted);
+  line-height: 1.7;
+}
+
+.welcome-user-info {
+  margin: 26px 0;
+  padding: 16px 20px;
+  border: 1px solid var(--ef-border);
+  border-radius: 14px;
+  background: #10172a;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.welcome-user-info p {
+  margin: 9px 0;
+  color: var(--ef-muted);
+}
+
+.welcome-user-info strong {
+  color: var(--ef-text);
+}
+
+.welcome-message {
+  margin: 24px 0;
+}
+
+.welcome-card button,
+.welcome-page > button {
+  width: 100%;
+  min-height: 46px;
+  margin-top: 12px;
+  padding: 12px 18px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--ef-primary);
+  color: white;
+  font-weight: 700;
+}
+
+.welcome-card button:hover,
+.welcome-page > button:hover {
+  background: var(--ef-primary-hover);
+  transform: translateY(-1px);
+}
+
+.welcome-card .welcome-logout {
+  background: #263149;
+  border: 1px solid var(--ef-border);
+}
+
+.welcome-card .welcome-logout:hover {
+  background: #35415b;
+}
+
+/* ===== FORMULARIOS DE REGISTRO E INICIO DE SESIÓN ===== */
+/* Estas reglas se aplican a los formularios sin depender
+   de la estructura específica de Register.jsx o Login.jsx. */
+
+form {
+  width: 100%;
+}
+
+form label {
+  display: block;
+  margin: 16px 0 7px;
+  color: #dce4f2;
+  font-size: 14px;
+  font-weight: 600;
+  text-align: left;
+}
+
+form input,
+form select,
+form textarea {
+  display: block;
+  width: 100%;
+  min-height: 46px;
+  padding: 12px 14px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: #0e1527;
+  color: var(--ef-text);
+}
+
+form input::placeholder,
+form textarea::placeholder {
+  color: #78859e;
+}
+
+form button[type="submit"] {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 24px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: 12px;
+  background: var(--ef-primary);
+  color: white;
+  font-weight: 800;
+}
+
+form button[type="submit"]:hover {
+  background: var(--ef-primary-hover);
+}
+
+/* ===== RUTINAS AUTOMÁTICAS ===== */
+.routines-page {
+  min-height: 100vh;
+  padding: 40px 18px 60px;
+}
+
+.routines-card {
+  width: 100%;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: clamp(20px, 5vw, 38px);
+  border: 1px solid var(--ef-border);
+  border-radius: 24px;
+  background: rgba(21, 29, 49, 0.96);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.25);
+}
+
+.routines-card > button:first-child {
+  padding: 10px 14px;
+  border: 1px solid var(--ef-border);
+  border-radius: 10px;
+  background: #222d45;
+  color: var(--ef-text);
+}
+
+.routines-card > button:first-child:hover {
+  background: #303d59;
+}
+
+.routines-card h1 {
+  margin: 28px 0 10px;
+  font-size: clamp(28px, 5vw, 38px);
+}
+
+.routines-card > p {
+  margin-bottom: 26px;
+  color: var(--ef-muted);
+  line-height: 1.7;
+}
+
+.routines-card form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 18px;
+}
+
+.routines-card form label {
+  margin-top: 12px;
+}
+
+.routines-card form button[type="submit"] {
+  grid-column: 1 / -1;
+}
+
+.routine-error {
+  margin-top: 22px;
+  padding: 14px;
+  border: 1px solid #7f303b;
+  border-radius: 10px;
+  background: #351c2a;
+  color: #fecaca;
+}
+
+.routine-result {
+  margin-top: 30px;
+  padding: clamp(16px, 4vw, 26px);
+  border: 1px solid var(--ef-border);
+  border-radius: 18px;
+  background: #10172a;
+}
+
+.routine-result h2 {
+  margin-top: 0;
+  font-size: 26px;
+}
+
+.routine-result h3 {
+  margin-top: 28px;
+  color: #c4b5fd;
+}
+
+.routine-result > p {
+  color: var(--ef-muted);
+  line-height: 1.7;
+}
+
+.routine-result ol {
+  padding-left: 24px;
+}
+
+.routine-result li {
+  margin: 16px 0;
+  padding: 14px;
+  border: 1px solid var(--ef-border);
+  border-radius: 12px;
+  background: #151d31;
+}
+
+.routine-result li strong {
+  color: #ddd6fe;
+}
+
+.routine-result li p {
+  margin-bottom: 0;
+  color: var(--ef-muted);
+  line-height: 1.7;
+}
+
+/* ===== PANTALLAS PEQUEÑAS ===== */
+@media (max-width: 560px) {
+  .welcome-card {
+    padding: 26px 20px;
+  }
+
+  .routines-page {
+    padding: 18px 12px 36px;
+  }
+
+  .routines-card {
+    border-radius: 18px;
+  }
+
+  .routines-card form {
+    grid-template-columns: 1fr;
+  }
+
+  .routines-card form button[type="submit"] {
+    grid-column: auto;
+  }
+}
