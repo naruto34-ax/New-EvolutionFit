@@ -6,7 +6,7 @@ import Routines from './components/Routines';
 import './App.css';
 
 const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 async function sendRequest(endpoint, body) {
   try {

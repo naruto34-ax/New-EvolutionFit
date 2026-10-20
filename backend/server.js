@@ -9,7 +9,7 @@ const routinesRoutes = require('./src/routines');
 
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Configuración de middlewares
 app.use(cors({
