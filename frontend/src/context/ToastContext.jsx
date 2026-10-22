@@ -15,14 +15,15 @@ export function ToastProvider({ children }) {
   const nextId = useRef(1);
 
   const showToast = useCallback((title, message, type = 'info') => {
+    const duration = type === 'error' || type === 'warning' ? 7000 : 4000;
     const id = nextId.current++;
     setToasts((prev) => [...prev, { id, title, message, type, leaving: false }]);
     setTimeout(() => {
       setToasts((prev) => prev.map((t) => (t.id === id ? { ...t, leaving: true } : t)));
-    }, 3500);
+    }, duration);
     setTimeout(() => {
       setToasts((prev) => prev.filter((t) => t.id !== id));
-    }, 3800);
+    }, duration + 300);
   }, []);
 
   const value = useMemo(() => ({ showToast }), [showToast]);

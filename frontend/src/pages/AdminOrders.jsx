@@ -5,6 +5,7 @@ import { useToast } from '../context/ToastContext';
 import { getAllOrders, updateOrderStatus, nextStatuses, ORDER_STATUS } from '../services/orderService';
 import StatusBadge from '../components/StatusBadge';
 import { formatCOP } from '../utils/format';
+import ConfirmModal from '../components/ConfirmModal';
 
 export default function AdminOrders() {
   const { user, addPoints } = useAuth();
@@ -12,6 +13,7 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
+  const [pendingCancel, setPendingCancel] = useState(null);
 
   const isAdmin = user.role === 'admin';
 
@@ -39,10 +41,7 @@ export default function AdminOrders() {
   );
   const toShip = orders.filter((o) => o.status === 'paid').length;
 
-  async function handleChange(order, next) {
-    if (next === 'cancelled' && !window.confirm('¿Cancelar este pedido? Se devolverá el stock y se restarán los puntos.')) {
-      return;
-    }
+  async function applyChange(order, next) {
     try {
       const updated = await updateOrderStatus(order.id, next);
       if (next === 'cancelled') addPoints(order.userId, -order.pointsEarned);
@@ -51,6 +50,11 @@ export default function AdminOrders() {
     } catch (error) {
       showToast('No se pudo actualizar', error.message, 'error');
     }
+  }
+
+  function handleChange(order, next) {
+    if (next === 'cancelled') setPendingCancel(order);
+    else applyChange(order, next);
   }
 
   if (!isAdmin) {
@@ -88,14 +92,28 @@ export default function AdminOrders() {
       <div className="filters-bar" style={{ marginBottom: '1.5rem' }}>
         <div className="filter-group">
           <div className="filter-btns">
-            <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>Todos</button>
+            <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')} aria-pressed={filter === 'all'} >Todos</button>
             {Object.entries(ORDER_STATUS).map(([key, info]) => (
-              <button key={key} className={`filter-btn ${filter === key ? 'active' : ''}`} onClick={() => setFilter(key)}>
+              <button key={key} className={`filter-btn ${filter === key ? 'active' : ''}`} onClick={() => setFilter(key)} aria-pressed={filter === key}>
                 {info.label}
               </button>
             ))}
           </div>
         </div>
+        {pendingCancel && (
+          <ConfirmModal
+            title="Cancelar pedido"
+            message={`¿Cancelar el pedido ${pendingCancel.id} de ${pendingCancel.userName}? Se devolverá el stock y se restarán ${pendingCancel.pointsEarned} puntos. Esta acción no se puede deshacer.`}
+            confirmLabel="Sí, cancelar pedido"
+            danger
+            onCancel={() => setPendingCancel(null)}
+            onConfirm={() => {
+              const order = pendingCancel;
+              setPendingCancel(null);
+              applyChange(order, 'cancelled');
+            }}
+          />
+        )}
       </div>
 
       <div className="card">

@@ -73,11 +73,12 @@ export default function Store() {
           <h1 className="section-title"><i className="fas fa-shopping-bag"></i> Tienda Fitness</h1>
           <p className="section-subtitle">Equipos, suplementos y ropa deportiva de calidad</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setCartOpen(true)} style={{ position: 'relative' }}>
+        <button className="btn btn-primary" onClick={() => setCartOpen(true)} style={{ position: 'relative' }} aria-label={count > 0 ? `Abrir carrito, ${count} productos` : 'Abrir carrito'}>
           <i className="fas fa-shopping-cart"></i> Carrito
           {count > 0 && (
             <span
               style={{ position: 'absolute', top: -8, right: -8, background: '#FF6584', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700 }}
+              aria-hidden = "true"
             >
               {count}
             </span>
@@ -93,6 +94,7 @@ export default function Store() {
                 key={c.id}
                 className={`filter-btn ${category === c.id ? 'active' : ''}`}
                 onClick={() => setCategory(c.id)}
+                aria-pressed={category === c.id}
               >
                 <i className={c.icon}></i> {c.label}
               </button>
@@ -111,6 +113,7 @@ export default function Store() {
             placeholder="Buscar productos..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
+            aria-label="Buscar productos"
           />
         </div>
       </div>

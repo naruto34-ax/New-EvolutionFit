@@ -19,7 +19,7 @@ function NotFound() {
 function DevToolbar() {
   const { user, users, switchUser } = useAuth();
   const linkStyle = ({ isActive }) => ({
-    color: isActive ? 'var(--primary)' : 'inherit',
+    color: isActive ? '#B7B2FF' : 'var(--text)',
     fontWeight: isActive ? 700 : 400
   });
 
@@ -27,7 +27,7 @@ function DevToolbar() {
     <div
       style={{
         position: 'fixed', bottom: 12, left: 12, zIndex: 50, display: 'flex', gap: '0.9rem',
-        alignItems: 'center', flexWrap: 'wrap', background: 'var(--card-bg2)',
+        alignItems: 'center', flexWrap: 'wrap', background: 'var(--card-bg2)', color: 'var(--text)',
         border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px', fontSize: '0.75rem'
       }}
     >
@@ -36,7 +36,11 @@ function DevToolbar() {
       <NavLink to="/admin/pedidos" style={linkStyle}>Pedidos (admin)</NavLink>
       <label>
         Usuario de prueba:{' '}
-        <select value={user.id} onChange={(e) => switchUser(Number(e.target.value))}>
+        <select
+          value={user.id}
+          onChange={(e) => switchUser(Number(e.target.value))}
+          style={{ color: 'var(--text)', background: 'var(--card-bg2)', border: '1px solid var(--border)', borderRadius: 4 }}
+        >
           {users.map((u) => (
             <option key={u.id} value={u.id}>{u.name} ({u.role})</option>
           ))}

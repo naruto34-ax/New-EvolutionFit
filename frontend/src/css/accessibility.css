@@ -1,0 +1,15 @@
+/* Foco siempre visible al navegar con teclado */
+:focus-visible {
+  outline: 3px solid #a5a0ff;
+  outline-offset: 2px;
+}
+
+/* Respeta a quien pidió menos animaciones en su sistema */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
