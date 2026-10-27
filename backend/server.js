@@ -27,7 +27,7 @@ app.use('/api/routines', routinesRoutes);
 // Ruta de prueba del servidor y la base de datos
 app.get('/api/health', async (req, res) => {
   try {
-    const [rows] = await pool.query('SELECT 1 AS ok');
+    const { rows } = await pool.query('SELECT 1 AS ok');
 
     res.json({
       status: 'ok',
@@ -59,16 +59,16 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Iniciar servidor y comprobar conexión con MySQL
+// Iniciar servidor y comprobar conexión con PostgreSQL
 app.listen(PORT, async () => {
   console.log(`Servidor activo en http://localhost:${PORT}`);
 
   try {
     await pool.query('SELECT 1');
-    console.log('MySQL conectado');
+    console.log('PostgreSQL conectado');
   } catch (error) {
     console.error(
-      'No se pudo conectar a MySQL:',
+      'No se pudo conectar a PostgreSQL:',
       error.message
     );
   }
