@@ -13,6 +13,10 @@ El backend usa PostgreSQL y acepta una cadena de conexión `DATABASE_URL`.
 
 La ruta `GET /api/health` comprueba que el backend puede consultar PostgreSQL.
 
-La migración crea las tablas necesarias para usuarios, ejercicios y rutinas. No copia datos existentes de MySQL ni datos guardados en `localStorage`; el catálogo de ejercicios se carga por separado.
+Las migraciones crean tablas para perfiles, ejercicios, rutinas, progreso, nutrición, logros, retos, mensajes, notificaciones, fotos de progreso, productos, carritos, pedidos y referencias de pago. No copian datos existentes de MySQL ni datos guardados en `localStorage`; los catálogos de ejercicios, logros, retos y productos se cargan por separado.
+
+Esto deja listo el esquema central, pero la app todavía necesita endpoints y cambios en sus servicios de frontend para dejar de guardar esos datos en `localStorage`.
+
+Las fotos deben guardarse en almacenamiento de archivos (por ejemplo, Vercel Blob); PostgreSQL conserva su URL y metadatos. No guardes números de tarjeta ni códigos de seguridad en la base: conserva solo el estado y las referencias del proveedor de pagos.
 
 En producción, configura `DATABASE_URL` y `JWT_SECRET` como variables secretas del proveedor de hosting, no como archivos versionados.
