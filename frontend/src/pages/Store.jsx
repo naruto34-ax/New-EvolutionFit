@@ -1,12 +1,13 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { getProducts } from '../services/productService';
+import useAsync from '../hooks/useAsync';
 import { useCart } from '../context/CartContext';
 import { useToast } from '../context/ToastContext';
 import ProductCard from '../components/ProductCard';
 import ProductModal from '../components/ProductModal';
 import CartModal from '../components/CartModal';
 import CheckoutModal from '../components/CheckoutModal';
-
+import { LoadingState, EmptyState, ErrorState } from '../components/StateViews';
 
 const CATEGORIES = [
   { id: 'all', label: 'Todo', icon: 'fas fa-th' },
@@ -19,34 +20,20 @@ const CATEGORIES = [
 export default function Store() {
   const { count, addItem } = useCart();
   const { showToast } = useToast();
+  const { data, loading, error, reload } = useAsync(getProducts);
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [category, setCategory] = useState('all');
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    getProducts().then((data) => {
-      if (active) {
-        setProducts(data);
-        setLoading(false);
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, []);
-
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
-    return products.filter(
+    return (data ?? []).filter(
       (p) => (category === 'all' || p.category === category) && p.name.toLowerCase().includes(term)
     );
-  }, [products, category, search]);
+  }, [data, category, search]);
 
   function handleAdd(product) {
     const result = addItem(product);
@@ -59,10 +46,6 @@ export default function Store() {
     setCheckoutOpen(true);
   }
 
-  function handlePaid() {
-    getProducts().then(setProducts); // refresca el stock en pantalla
-  }
-
   return (
     <div className="page">
       <div
@@ -73,12 +56,17 @@ export default function Store() {
           <h1 className="section-title"><i className="fas fa-shopping-bag"></i> Tienda Fitness</h1>
           <p className="section-subtitle">Equipos, suplementos y ropa deportiva de calidad</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setCartOpen(true)} style={{ position: 'relative' }} aria-label={count > 0 ? `Abrir carrito, ${count} productos` : 'Abrir carrito'}>
+        <button
+          className="btn btn-primary"
+          onClick={() => setCartOpen(true)}
+          style={{ position: 'relative' }}
+          aria-label={count > 0 ? `Abrir carrito, ${count} productos` : 'Abrir carrito'}
+        >
           <i className="fas fa-shopping-cart"></i> Carrito
           {count > 0 && (
             <span
+              aria-hidden="true"
               style={{ position: 'absolute', top: -8, right: -8, background: '#FF6584', color: 'white', borderRadius: '50%', width: 20, height: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.7rem', fontWeight: 700 }}
-              aria-hidden = "true"
             >
               {count}
             </span>
@@ -104,6 +92,7 @@ export default function Store() {
         <div style={{ position: 'relative', maxWidth: 300 }}>
           <i
             className="fas fa-search"
+            aria-hidden="true"
             style={{ position: 'absolute', left: '1rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)' }}
           ></i>
           <input
@@ -111,21 +100,36 @@ export default function Store() {
             className="form-control"
             style={{ paddingLeft: '2.75rem' }}
             placeholder="Buscar productos..."
+            aria-label="Buscar productos"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            aria-label="Buscar productos"
           />
         </div>
       </div>
 
+      <p className="sr-only" role="status">
+        {loading || error ? '' : `${visible.length} productos encontrados`}
+      </p>
+
       {loading ? (
-        <div className="spinner"></div>
+        <LoadingState label="Cargando productos..." />
+      ) : error ? (
+        <ErrorState message={error} onRetry={() => reload()} />
       ) : visible.length === 0 ? (
-        <div className="empty-state">
-          <i className="fas fa-search"></i>
-          <h3>Sin resultados</h3>
-          <p>Prueba con otra búsqueda o categoría</p>
-        </div>
+        <EmptyState icon="fas fa-search" title="Sin resultados" message="Prueba con otra búsqueda o categoría">
+          {(search || category !== 'all') && (
+            <button
+              className="btn btn-secondary"
+              style={{ marginTop: '1rem' }}
+              onClick={() => {
+                setSearch('');
+                setCategory('all');
+              }}
+            >
+              Limpiar filtros
+            </button>
+          )}
+        </EmptyState>
       ) : (
         <div className="grid-auto">
           {visible.map((p) => (
@@ -138,7 +142,12 @@ export default function Store() {
         <ProductModal product={selected} onClose={() => setSelected(null)} onAdd={handleAdd} />
       )}
       {cartOpen && <CartModal onClose={() => setCartOpen(false)} onCheckout={handleCheckout} />}
-      {checkoutOpen && <CheckoutModal onClose={() => setCheckoutOpen(false)} onPaid={handlePaid} />}
+      {checkoutOpen && (
+        <CheckoutModal
+          onClose={() => setCheckoutOpen(false)}
+          onPaid={() => reload({ silent: true })}
+        />
+      )}
     </div>
   );
 }
