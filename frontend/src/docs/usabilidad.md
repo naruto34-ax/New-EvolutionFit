@@ -4,9 +4,9 @@
 
 | Pantalla | Antes | Después |
 |---|---|---|
-| /tienda | 95 | |
-| /mis-pedidos | 94 | |
-| /admin/pedidos | 95 | |
+| /tienda | 91 | 95 |
+| /mis-pedidos | 92 | 94 |
+| /admin/pedidos | 95 | 95 |
 
 ## Problemas detectados y arreglos
 
