@@ -1,27 +1,25 @@
-import { Routes, Route, Navigate, NavLink, Link } from 'react-router-dom';
+import { Routes, Route, Navigate, Link } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { CartProvider } from './context/CartContext';
+import AppLayout from './components/layout/Applayout';
+import { HOME_PATH } from './config/navigation';
 import Store from './pages/Store';
 import MyOrders from './pages/MyOrders';
 import AdminOrders from './pages/AdminOrders';
 
 function NotFound() {
-  return(
+  return (
     <div className="page" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
       <h1 className="section-title">Página no encontrada</h1>
       <p className="section-subtitle">La página que buscas no existe o fue movida.</p>
-      <Link to="/tienda" className="btn btn-primary">Volver a la tienda</Link>
+      <Link to={HOME_PATH} className="btn btn-primary">Volver al inicio</Link>
     </div>
   );
 }
 
-// TEMPORAL: se elimina cuando lleguen el login y el navbar reales
+// TEMPORAL: se elimina cuando llegue el login real
 function DevToolbar() {
   const { user, users, switchUser } = useAuth();
-  const linkStyle = ({ isActive }) => ({
-    color: isActive ? '#B7B2FF' : 'var(--text)',
-    fontWeight: isActive ? 700 : 400
-  });
 
   return (
     <div
@@ -31,9 +29,6 @@ function DevToolbar() {
         border: '1px solid var(--border)', borderRadius: 8, padding: '6px 10px', fontSize: '0.75rem'
       }}
     >
-      <NavLink to="/tienda" style={linkStyle}>Tienda</NavLink>
-      <NavLink to="/mis-pedidos" style={linkStyle}>Mis pedidos</NavLink>
-      <NavLink to="/admin/pedidos" style={linkStyle}>Pedidos (admin)</NavLink>
       <label>
         Usuario de prueba:{' '}
         <select
@@ -52,20 +47,21 @@ function DevToolbar() {
 }
 
 export default function App() {
-const { user } = useAuth();
+  const { user } = useAuth();
 
   return (
     <CartProvider key={user.id} userId={user.id}>
-      <div id="app">
-        <main id="main-content" className="main-content" style={{ paddingBottom: import.meta.env.DEV ? '4rem' : undefined }}>
-          <Routes>
-            <Route path="/" element={<Navigate to="/tienda" replace />} />
+      <div id="app" style={{ paddingBottom: import.meta.env.DEV ? '3.5rem' : undefined }}>
+        <Routes>
+          {/* Las páginas públicas (login, registro) van aquí, fuera de AppLayout */}
+          <Route element={<AppLayout />}>
+            <Route path="/" element={<Navigate to={HOME_PATH} replace />} />
             <Route path="/tienda" element={<Store />} />
             <Route path="/mis-pedidos" element={<MyOrders />} />
             <Route path="/admin/pedidos" element={<AdminOrders />} />
             <Route path="*" element={<NotFound />} />
-          </Routes>
-        </main>
+          </Route>
+        </Routes>
         {import.meta.env.DEV && <DevToolbar />}
       </div>
     </CartProvider>
