@@ -5,9 +5,11 @@ const express = require('express');
 const cors = require('cors');
 const pool = require('./config/connection');
 const authRoutes = require('./src/auth');
+const routinesRoutes = require('./src/routines');
+
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Configuración de middlewares
 app.use(cors({
@@ -18,6 +20,9 @@ app.use(express.json());
 
 // Rutas de autenticación: registro e inicio de sesión
 app.use('/api/auth', authRoutes);
+
+// Rutas de rutinas y ejercicios
+app.use('/api/routines', routinesRoutes);
 
 // Ruta de prueba del servidor y la base de datos
 app.get('/api/health', async (req, res) => {

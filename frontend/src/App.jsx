@@ -2,9 +2,11 @@
 import { useState } from 'react';
 import Register from './components/Register';
 import Login from './components/Login';
+import Routines from './components/Routines';
+import './App.css';
 
 const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:3000';
+  import.meta.env.VITE_API_URL || 'http://localhost:3001';
 
 async function sendRequest(endpoint, body) {
   try {
@@ -44,6 +46,14 @@ function App() {
   const [page, setPage] = useState('login');
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
+  if (page === 'routines' && user && token) {
+  return (
+    <Routines
+      token={token}
+      onBack={() => setPage('welcome')}
+    />
+  );
+}
 
   const handleNavigate = (destination) => {
     if (['register', 'login', 'landing'].includes(destination)) {
@@ -161,6 +171,16 @@ function App() {
           <p className="welcome-message">
             Tu evolución comienza hoy. ¡Vamos por tus objetivos!
           </p>
+
+          
+
+          <button
+            type="button"
+            className="welcome-routines"
+            onClick={() => setPage('routines')}
+          >
+            Generar rutina
+          </button>
 
           <button
             type="button"
