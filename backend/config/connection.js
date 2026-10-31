@@ -1,17 +1,21 @@
 
 require('dotenv').config();
 
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  port: Number(process.env.DB_PORT || 3306),
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME || 'evolutionfit',
-  waitForConnections: true,
-  connectionLimit: 10,
-  charset: 'utf8mb4'
+if (!process.env.DATABASE_URL) {
+  throw new Error('DATABASE_URL is required for the PostgreSQL connection.');
+}
+
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  max: Number(process.env.DB_POOL_MAX || 10),
+  idleTimeoutMillis: 30_000,
+  connectionTimeoutMillis: 10_000
+});
+
+pool.on('error', (error) => {
+  console.error('Unexpected PostgreSQL pool error:', error.message);
 });
 
 module.exports = pool;
