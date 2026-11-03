@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import "./Login.css";
 
@@ -10,35 +9,29 @@ function Login({ onLogin, onNavigate }) {
   const [loading, setLoading] = useState(false);
 
   const quickAccounts = [
-    {
-      label: "Admin",
-      letter: "A",
-      color: "#ff6584",
-      email: "admin@evolutionfit.com",
-      password: "Admin123!",
-    },
-    {
-      label: "Coach",
-      letter: "C",
-      color: "#43e97b",
-      email: "coach@evolutionfit.com",
-      password: "Coach123!",
-    },
-    {
-      label: "Usuario",
-      letter: "M",
-      color: "#6c63ff",
-      email: "maria@demo.com",
-      password: "Demo123!",
-    },
+    { label: "Admin", letter: "A", color: "#ff6584", email: "admin@evolutionfit.com", password: "Admin123!" },
+    { label: "Coach", letter: "C", color: "#43e97b", email: "coach@evolutionfit.com", password: "Coach123!" },
+    { label: "Usuario", letter: "M", color: "#6c63ff", email: "maria@demo.com", password: "Demo123!" },
   ];
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
 
-    if (!email.trim() || !password) {
-      setError("Ingresa tu correo electrónico y contraseña.");
+    // Validaciones personalizadas sin alertas HTML5 nativas
+    if (!email.trim()) {
+      setError("Por favor, ingresa tu correo electrónico.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setError("El correo electrónico no tiene un formato válido (ejemplo: usuario@dominio.com).");
+      return;
+    }
+
+    if (!password) {
+      setError("Por favor, ingresa tu contraseña.");
       return;
     }
 
@@ -46,21 +39,15 @@ function Login({ onLogin, onNavigate }) {
 
     try {
       if (onLogin) {
-        const result = await onLogin({
-          email: email.trim(),
-          password,
-        });
-
+        const result = await onLogin({ email: email.trim(), password });
         if (result === false || result?.success === false) {
-          setError(result?.error || "No se pudo iniciar sesión.");
+          setError(result?.error || "Credenciales incorrectas. Inténtalo de nuevo.");
         }
       } else {
-        setError(
-          "La interfaz está lista, pero falta conectar la autenticación."
-        );
+        setError("Servicio de autenticación no disponible.");
       }
     } catch {
-      setError("No se pudo iniciar sesión. Inténtalo nuevamente.");
+      setError("Error al conectar con el servidor. Revisa tu conexión.");
     } finally {
       setLoading(false);
     }
@@ -81,10 +68,8 @@ function Login({ onLogin, onNavigate }) {
             className="login-brand"
             onClick={() => onNavigate?.("landing")}
           >
-            <img src="/logo.png" alt="" />
-            <span>
-              Evolution<strong>Fit</strong>
-            </span>
+            <img src="/logo.png" alt="EvolutionFit Logo" />
+            <span>Evolution<strong>Fit</strong></span>
           </button>
 
           <div className="login-visual-content">
@@ -107,9 +92,7 @@ function Login({ onLogin, onNavigate }) {
             </ul>
           </div>
 
-          <p className="login-visual-footer">
-            Tu bienestar, tu evolución.
-          </p>
+          <p className="login-visual-footer">Tu bienestar, tu evolución.</p>
         </aside>
 
         <section className="login-form-side">
@@ -120,17 +103,20 @@ function Login({ onLogin, onNavigate }) {
               <p>Ingresa a tu cuenta para continuar</p>
             </div>
 
-            <form onSubmit={handleSubmit} className="login-form">
+            <form onSubmit={handleSubmit} className="login-form" noValidate>
               <div className="login-field">
                 <label htmlFor="login-email">Correo electrónico</label>
                 <input
                   id="login-email"
-                  type="email"
+                  type="text"
                   placeholder="tu@correo.com"
                   autoComplete="email"
                   value={email}
-                  onChange={(event) => setEmail(event.target.value)}
-                  required
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) setError("");
+                  }}
+                  className={error && !email ? "input-error" : ""}
                 />
               </div>
 
@@ -143,18 +129,16 @@ function Login({ onLogin, onNavigate }) {
                     placeholder="Tu contraseña"
                     autoComplete="current-password"
                     value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    required
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (error) setError("");
+                    }}
+                    className={error && !password ? "input-error" : ""}
                   />
                   <button
                     type="button"
                     className="login-toggle"
                     onClick={() => setShowPassword(!showPassword)}
-                    aria-label={
-                      showPassword
-                        ? "Ocultar contraseña"
-                        : "Mostrar contraseña"
-                    }
                   >
                     {showPassword ? "Ocultar" : "Mostrar"}
                   </button>
@@ -162,16 +146,12 @@ function Login({ onLogin, onNavigate }) {
               </div>
 
               {error && (
-                <p className="login-error" role="alert">
-                  {error}
-                </p>
+                <div className="login-error" role="alert">
+                  <span className="error-icon">⚠️</span> {error}
+                </div>
               )}
 
-              <button
-                type="submit"
-                className="login-submit"
-                disabled={loading}
-              >
+              <button type="submit" className="login-submit" disabled={loading}>
                 {loading ? "Verificando..." : "Iniciar sesión"}
               </button>
             </form>
@@ -188,10 +168,7 @@ function Login({ onLogin, onNavigate }) {
                   className="login-quick-button"
                   onClick={() => selectQuickAccount(account)}
                 >
-                  <span
-                    className="login-avatar"
-                    style={{ backgroundColor: account.color }}
-                  >
+                  <span className="login-avatar" style={{ backgroundColor: account.color }}>
                     {account.letter}
                   </span>
                   <span>{account.label}</span>
@@ -201,19 +178,12 @@ function Login({ onLogin, onNavigate }) {
 
             <p className="login-switch">
               ¿No tienes cuenta?{" "}
-              <button
-                type="button"
-                onClick={() => onNavigate?.("register")}
-              >
+              <button type="button" onClick={() => onNavigate?.("register")}>
                 Regístrate gratis
               </button>
             </p>
 
-            <button
-              type="button"
-              className="login-back"
-              onClick={() => onNavigate?.("landing")}
-            >
+            <button type="button" className="login-back" onClick={() => onNavigate?.("landing")}>
               ← Volver al inicio
             </button>
           </div>
