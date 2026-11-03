@@ -1,25 +1,21 @@
-
 import { useState } from 'react';
 import Register from './components/Register';
 import Login from './components/Login';
 import Routines from './components/Routines';
 import './App.css';
 
-const API_URL =
-  import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// URL forzada directamente al puerto 3001 para asegurar la conexión
+const API_URL = 'http://localhost:3001';
 
 async function sendRequest(endpoint, body) {
   try {
-    const response = await fetch(
-      `${API_URL}/api/auth/${endpoint}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      }
-    );
+    const response = await fetch(`${API_URL}/api/auth/${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
 
     const data = await response.json().catch(() => ({}));
 
@@ -46,14 +42,6 @@ function App() {
   const [page, setPage] = useState('login');
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
-  if (page === 'routines' && user && token) {
-  return (
-    <Routines
-      token={token}
-      onBack={() => setPage('welcome')}
-    />
-  );
-}
 
   const handleNavigate = (destination) => {
     if (['register', 'login', 'landing'].includes(destination)) {
@@ -75,16 +63,12 @@ function App() {
   };
 
   const handleLogin = async ({ email, password }) => {
-    const result = await sendRequest('login', {
-      email,
-      password,
-    });
+    const result = await sendRequest('login', { email, password });
 
     if (!result.success) {
       return result;
     }
 
-    // Verificar que el backend devuelva usuario y token.
     if (!result.token || !result.user) {
       return {
         success: false,
@@ -108,6 +92,15 @@ function App() {
     setPage('login');
   };
 
+  if (page === 'routines' && user && token) {
+    return (
+      <Routines
+        token={token}
+        onBack={() => setPage('welcome')}
+      />
+    );
+  }
+
   if (page === 'register') {
     return (
       <Register
@@ -120,16 +113,18 @@ function App() {
   if (page === 'landing') {
     return (
       <main className="welcome-page">
-        <h1>EvolutionFit</h1>
-        <p>Tu bienestar, tu evolución.</p>
+        <section className="welcome-card">
+          <h1>EvolutionFit</h1>
+          <p>Tu bienestar, tu evolución.</p>
 
-        <button onClick={() => setPage('login')}>
-          Iniciar sesión
-        </button>
+          <button onClick={() => setPage('login')}>
+            Iniciar sesión
+          </button>
 
-        <button onClick={() => setPage('register')}>
-          Crear cuenta
-        </button>
+          <button onClick={() => setPage('register')}>
+            Crear cuenta
+          </button>
+        </section>
       </main>
     );
   }
@@ -144,35 +139,21 @@ function App() {
             className="welcome-logo"
           />
 
-          <p className="welcome-eyebrow">
-            EVOLUTION FIT
-          </p>
+          <p className="welcome-eyebrow">EVOLUTION FIT</p>
 
-          <h1>
-            ¡Bienvenido, {user.name}!
-          </h1>
+          <h1>¡Bienvenido, {user.name}!</h1>
 
-          <p>
-            Has iniciado sesión correctamente.
-          </p>
+          <p>Has iniciado sesión correctamente.</p>
 
           <div className="welcome-user-info">
-            <p>
-              <strong>Nombre:</strong> {user.name}
-            </p>
-            <p>
-              <strong>Correo:</strong> {user.email}
-            </p>
-            <p>
-              <strong>Rol:</strong> {user.role}
-            </p>
+            <p><strong>Nombre:</strong> {user.name}</p>
+            <p><strong>Correo:</strong> {user.email}</p>
+            <p><strong>Rol:</strong> {user.role}</p>
           </div>
 
           <p className="welcome-message">
             Tu evolución comienza hoy. ¡Vamos por tus objetivos!
           </p>
-
-          
 
           <button
             type="button"

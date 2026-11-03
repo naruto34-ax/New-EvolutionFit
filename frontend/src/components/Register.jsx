@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import "./Register.css";
 
@@ -15,18 +14,14 @@ function Register({ onNavigate, onRegister }) {
     confirmPassword: "",
   });
 
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    setForm((previous) => ({
-      ...previous,
-      [name]: value,
-    }));
-
+    setForm((prev) => ({ ...prev, [name]: value }));
     setError("");
     setMessage("");
   };
@@ -36,71 +31,64 @@ function Register({ onNavigate, onRegister }) {
     setError("");
     setMessage("");
 
-    if (!form.name.trim() || !form.email.trim()) {
-      setError("Completa tu nombre y correo electrónico.");
+    // Validaciones personalizadas
+    if (!form.name.trim()) {
+      setError("Por favor, ingresa tu nombre completo.");
+      return;
+    }
+
+    if (!form.email.trim()) {
+      setError("Por favor, ingresa tu correo electrónico.");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(form.email.trim())) {
+      setError("Ingresa un correo electrónico válido (ejemplo: usuario@dominio.com).");
       return;
     }
 
     if (form.password.length < 6) {
-      setError("La contraseña debe tener mínimo 6 caracteres.");
+      setError("La contraseña debe contener al menos 6 caracteres.");
       return;
     }
 
     if (form.password !== form.confirmPassword) {
-      setError("Las contraseñas no coinciden.");
+      setError("Las contraseñas no coinciden. Verifícalas.");
       return;
     }
 
-    if (
-      form.age &&
-      (!Number.isInteger(Number(form.age)) ||
-        Number(form.age) < 1 ||
-        Number(form.age) > 120)
-    ) {
-      setError("Ingresa una edad válida.");
-      return;
-    }
-
-    if (typeof onRegister !== "function") {
-      setError("El registro todavía no está conectado al servidor.");
+    if (form.age && (Number(form.age) < 12 || Number(form.age) > 100)) {
+      setError("Ingresa una edad válida (entre 12 y 100 años).");
       return;
     }
 
     setLoading(true);
 
     try {
-      const result = await onRegister({
-        name: form.name.trim(),
-        email: form.email.trim(),
-        age: form.age,
-        gender: form.gender,
-        population: form.population,
-        preferredSpace: form.preferredSpace,
-        level: form.level,
-        password: form.password,
-      });
+      if (typeof onRegister === "function") {
+        const result = await onRegister({
+          name: form.name.trim(),
+          email: form.email.trim(),
+          age: form.age || null,
+          gender: form.gender || null,
+          population: form.population,
+          preferredSpace: form.preferredSpace,
+          level: form.level,
+          password: form.password,
+        });
 
-      if (!result || result.success !== true) {
-        setError(
-          result?.error || "No se pudo completar el registro."
-        );
-        return;
+        if (!result || result.success !== true) {
+          setError(result?.error || "No se pudo registrar el usuario.");
+          return;
+        }
+
+        setMessage("¡Registro exitoso! Redirigiendo al inicio de sesión...");
+        setTimeout(() => onNavigate?.("login"), 1800);
+      } else {
+        setError("El servicio de registro no está disponible.");
       }
-
-      setMessage(
-        "¡Registro exitoso! Ya puedes iniciar sesión."
-      );
-
-      setForm((previous) => ({
-        ...previous,
-        name: "",
-        email: "",
-        age: "",
-        gender: "",
-        password: "",
-        confirmPassword: "",
-      }));
-    } catch (err) {
+    } catch {
       setError("No se pudo conectar con el servidor.");
     } finally {
       setLoading(false);
@@ -108,217 +96,175 @@ function Register({ onNavigate, onRegister }) {
   };
 
   return (
-    <main className="auth-page">
-      <section className="auth-left">
-        <button
-          type="button"
-          className="auth-brand"
-          onClick={() => onNavigate?.("landing")}
-        >
-          <img src="/logo.png" alt="" />
-          <span>
-            Evolution<strong>Fit</strong>
-          </span>
-        </button>
-
-        <div className="auth-left-content">
-          <h1>Comienza tu evolución</h1>
-          <p>
-            Crea tu cuenta y empieza a construir una versión más
-            saludable de ti.
-          </p>
-        </div>
-      </section>
-
-      <section className="auth-right">
-        <div className="auth-form-container">
-          <header className="auth-heading">
-            <span className="auth-eyebrow">EVOLUTION FIT</span>
-            <h2>Crear cuenta</h2>
-            <p>Completa tus datos para registrarte</p>
-          </header>
-
-          <form onSubmit={handleSubmit} className="auth-form">
-            <div className="auth-field">
-              <label htmlFor="register-name">Nombre completo</label>
-              <input
-                id="register-name"
-                name="name"
-                type="text"
-                placeholder="Tu nombre"
-                autoComplete="name"
-                value={form.name}
-                onChange={handleChange}
-                maxLength={120}
-                required
-              />
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-email">
-                Correo electrónico
-              </label>
-              <input
-                id="register-email"
-                name="email"
-                type="email"
-                placeholder="tu@correo.com"
-                autoComplete="email"
-                value={form.email}
-                onChange={handleChange}
-                maxLength={190}
-                required
-              />
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-age">Edad</label>
-              <input
-                id="register-age"
-                name="age"
-                type="number"
-                placeholder="Tu edad (opcional)"
-                min="1"
-                max="120"
-                value={form.age}
-                onChange={handleChange}
-              />
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-gender">Género (opcional)</label>
-              <select
-                id="register-gender"
-                name="gender"
-                value={form.gender}
-                onChange={handleChange}
-              >
-                <option value="">Prefiero no indicarlo</option>
-                <option value="femenino">Femenino</option>
-                <option value="masculino">Masculino</option>
-                <option value="otro">Otro</option>
-              </select>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-population">
-                Tipo de plan
-              </label>
-              <select
-                id="register-population"
-                name="population"
-                value={form.population}
-                onChange={handleChange}
-              >
-                <option value="general">General</option>
-                <option value="principiante">Principiante</option>
-                <option value="deportista">Deportista</option>
-              </select>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-space">
-                Lugar de entrenamiento
-              </label>
-              <select
-                id="register-space"
-                name="preferredSpace"
-                value={form.preferredSpace}
-                onChange={handleChange}
-              >
-                <option value="gym">Gimnasio</option>
-                <option value="home">Casa</option>
-                <option value="park">Parque</option>
-              </select>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-level">Nivel</label>
-              <select
-                id="register-level"
-                name="level"
-                value={form.level}
-                onChange={handleChange}
-              >
-                <option value="beginner">Principiante</option>
-                <option value="intermediate">Intermedio</option>
-                <option value="advanced">Avanzado</option>
-              </select>
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-password">Contraseña</label>
-              <input
-                id="register-password"
-                name="password"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                autoComplete="new-password"
-                value={form.password}
-                onChange={handleChange}
-                minLength={6}
-                maxLength={72}
-                required
-              />
-            </div>
-
-            <div className="auth-field">
-              <label htmlFor="register-confirm-password">
-                Confirmar contraseña
-              </label>
-              <input
-                id="register-confirm-password"
-                name="confirmPassword"
-                type="password"
-                placeholder="Repite tu contraseña"
-                autoComplete="new-password"
-                value={form.confirmPassword}
-                onChange={handleChange}
-                minLength={6}
-                maxLength={72}
-                required
-              />
-            </div>
-
-            {error && (
-              <p className="form-error" role="alert">
-                {error}
-              </p>
-            )}
-
-            {message && (
-              <p className="form-success" role="status">
-                {message}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              className="register-button"
-              disabled={loading}
-            >
-              {loading ? "Registrando..." : "Crear cuenta"}
-            </button>
-          </form>
-
-          <p className="auth-switch">
-            ¿Ya tienes una cuenta?{" "}
-            <button
-              type="button"
-              onClick={() => onNavigate?.("login")}
-            >
-              Inicia sesión
-            </button>
-          </p>
-
+    <main className="register-page">
+      <section className="register-layout">
+        <aside className="register-visual">
           <button
             type="button"
-            className="auth-back"
+            className="register-brand"
             onClick={() => onNavigate?.("landing")}
           >
-            ← Volver al inicio
+            <img src="/logo.png" alt="EvolutionFit Logo" />
+            <span>Evolution<strong>Fit</strong></span>
           </button>
-        </div>
+
+          <div className="register-visual-content">
+            <h2>Comienza tu evolución hoy</h2>
+            <p>Únete a nuestra comunidad y diseña rutinas adaptadas a tu nivel, espacio y objetivos.</p>
+            <ul className="register-benefits">
+              <li> Rutinas automáticas para gym, casa o parque</li>
+              <li> Seguimiento adaptado a tu nivel</li>
+              <li> Acceso rápido a tu panel personalizado</li>
+            </ul>
+          </div>
+
+          <p className="register-visual-footer">Tu bienestar, tu evolución.</p>
+        </aside>
+
+        <section className="register-form-side">
+          <div className="register-form-container">
+            <header className="register-heading">
+              <span className="register-eyebrow">EVOLUTION FIT</span>
+              <h1>Crear cuenta</h1>
+              <p>Llena los campos para personalizar tu plan</p>
+            </header>
+
+            <form onSubmit={handleSubmit} className="register-form" noValidate>
+              <div className="register-row">
+                <div className="register-field">
+                  <label htmlFor="reg-name">Nombre completo</label>
+                  <input
+                    id="reg-name"
+                    name="name"
+                    type="text"
+                    placeholder="Tu nombre"
+                    value={form.name}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="register-field">
+                  <label htmlFor="reg-email">Correo electrónico</label>
+                  <input
+                    id="reg-email"
+                    name="email"
+                    type="text"
+                    placeholder="tu@correo.com"
+                    value={form.email}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="register-row">
+                <div className="register-field">
+                  <label htmlFor="reg-age">Edad</label>
+                  <input
+                    id="reg-age"
+                    name="age"
+                    type="number"
+                    placeholder="Ej. 25"
+                    value={form.age}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="register-field">
+                  <label htmlFor="reg-gender">Género</label>
+                  <select id="reg-gender" name="gender" value={form.gender} onChange={handleChange}>
+                    <option value="">Prefiero no decir</option>
+                    <option value="femenino">Femenino</option>
+                    <option value="masculino">Masculino</option>
+                    <option value="otro">Otro</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="register-row triple">
+                <div className="register-field">
+                  <label htmlFor="reg-pop">Plan</label>
+                  <select id="reg-pop" name="population" value={form.population} onChange={handleChange}>
+                    <option value="general">General</option>
+                    <option value="principiante">Principiante</option>
+                    <option value="deportista">Deportista</option>
+                  </select>
+                </div>
+                <div className="register-field">
+                  <label htmlFor="reg-space">Lugar</label>
+                  <select id="reg-space" name="preferredSpace" value={form.preferredSpace} onChange={handleChange}>
+                    <option value="gym">Gimnasio</option>
+                    <option value="home">Casa</option>
+                    <option value="park">Parque</option>
+                  </select>
+                </div>
+                <div className="register-field">
+                  <label htmlFor="reg-level">Nivel</label>
+                  <select id="reg-level" name="level" value={form.level} onChange={handleChange}>
+                    <option value="beginner">Principiante</option>
+                    <option value="intermediate">Intermedio</option>
+                    <option value="advanced">Avanzado</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className="register-row">
+                <div className="register-field">
+                  <label htmlFor="reg-pass">Contraseña</label>
+                  <input
+                    id="reg-pass"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Min. 6 caracteres"
+                    value={form.password}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="register-field">
+                  <label htmlFor="reg-confirm">Confirmar contraseña</label>
+                  <input
+                    id="reg-confirm"
+                    name="confirmPassword"
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Repite tu contraseña"
+                    value={form.confirmPassword}
+                    onChange={handleChange}
+                  />
+                </div>
+              </div>
+
+              <div className="register-toggle-pass">
+                <button type="button" onClick={() => setShowPassword(!showPassword)}>
+                  {showPassword ? "🔒 Ocultar contraseñas" : "👁️ Mostrar contraseñas"}
+                </button>
+              </div>
+
+              {error && (
+                <div className="register-error" role="alert">
+                  <span>⚠️</span> {error}
+                </div>
+              )}
+
+              {message && (
+                <div className="register-success" role="status">
+                  <span>✅</span> {message}
+                </div>
+              )}
+
+              <button type="submit" className="register-submit" disabled={loading}>
+                {loading ? "Creando cuenta..." : "Crear cuenta"}
+              </button>
+            </form>
+
+            <p className="register-switch">
+              ¿Ya tienes cuenta?{" "}
+              <button type="button" onClick={() => onNavigate?.("login")}>
+                Inicia sesión
+              </button>
+            </p>
+
+            <button type="button" className="register-back" onClick={() => onNavigate?.("landing")}>
+              ← Volver al inicio
+            </button>
+          </div>
+        </section>
       </section>
     </main>
   );
