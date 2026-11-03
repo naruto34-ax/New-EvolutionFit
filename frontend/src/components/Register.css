@@ -1,0 +1,259 @@
+.register-page {
+  min-height: 100vh;
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #f7f5ff;
+  background: radial-gradient(ellipse at top left, #29204d, transparent 45%), #0b0b12;
+  font-family: Inter, system-ui, sans-serif;
+}
+
+.register-layout {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  width: 100%;
+  max-width: 1100px;
+  min-height: 680px;
+  overflow: hidden;
+  border: 1px solid rgba(139, 112, 255, 0.2);
+  border-radius: 24px;
+  background: #14131f;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+
+.register-visual {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  background: linear-gradient(145deg, #231b3c, #13101e 85%);
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.register-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  color: #fff;
+  border: 0;
+  background: transparent;
+  font-size: 22px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.register-brand img {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+}
+
+.register-brand strong {
+  color: #a38aff;
+}
+
+.register-visual-content h2 {
+  font-size: 26px;
+  margin-bottom: 12px;
+  color: #fff;
+}
+
+.register-visual-content p {
+  color: #b5aed0;
+  line-height: 1.5;
+  margin-bottom: 24px;
+}
+
+.register-benefits {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  list-style: none;
+  color: #d8d3e6;
+  font-size: 14px;
+}
+
+.register-visual-footer {
+  color: #7b748c;
+  font-size: 13px;
+}
+
+.register-form-side {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 36px 44px;
+  background: #14131f;
+}
+
+.register-form-container {
+  width: 100%;
+  max-width: 500px;
+}
+
+.register-eyebrow {
+  color: #a38aff;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 2px;
+}
+
+.register-heading h1 {
+  margin: 6px 0 4px;
+  color: #fff;
+  font-size: 26px;
+  font-weight: 800;
+}
+
+.register-heading p {
+  margin: 0 0 20px;
+  color: #9892a6;
+  font-size: 13px;
+}
+
+.register-form {
+  display: grid;
+  gap: 14px;
+}
+
+.register-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.register-row.triple {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.register-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.register-field label {
+  color: #dcd7e5;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.register-field input,
+.register-field select {
+  width: 100%;
+  min-height: 42px;
+  padding: 10px 12px;
+  color: #fff;
+  background: #0d0c15;
+  border: 1px solid #2e2842;
+  border-radius: 9px;
+  outline: none;
+  font-size: 13px;
+  transition: border-color 0.2s;
+}
+
+.register-field select {
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+.register-field input:focus,
+.register-field select:focus {
+  border-color: #8b70ff;
+  box-shadow: 0 0 0 3px rgba(139, 112, 255, 0.2);
+}
+
+.register-toggle-pass {
+  text-align: right;
+}
+
+.register-toggle-pass button {
+  background: transparent;
+  border: 0;
+  color: #a38aff;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.register-submit {
+  min-height: 46px;
+  margin-top: 6px;
+  padding: 12px;
+  color: #fff;
+  background: linear-gradient(135deg, #8261f5, #6745dc);
+  border: 0;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 6px 20px rgba(130, 97, 245, 0.3);
+  transition: transform 0.15s;
+}
+
+.register-submit:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.1);
+}
+
+.register-error,
+.register-success {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 9px;
+  font-size: 13px;
+}
+
+.register-error {
+  color: #ffcbd3;
+  background: rgba(230, 50, 75, 0.12);
+  border: 1px solid rgba(255, 92, 117, 0.35);
+}
+
+.register-success {
+  color: #d1ffd6;
+  background: rgba(40, 190, 90, 0.12);
+  border: 1px solid rgba(60, 220, 110, 0.35);
+}
+
+.register-switch {
+  margin: 18px 0 10px;
+  color: #9892a6;
+  text-align: center;
+  font-size: 13px;
+}
+
+.register-switch button {
+  padding: 0;
+  color: #a38aff;
+  background: none;
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.register-back {
+  display: block;
+  margin: 0 auto;
+  padding: 4px;
+  color: #7b748c;
+  background: none;
+  border: 0;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 820px) {
+  .register-layout {
+    grid-template-columns: 1fr;
+    max-width: 480px;
+  }
+  .register-visual {
+    display: none;
+  }
+  .register-row, .register-row.triple {
+    grid-template-columns: 1fr;
+  }
+}
