@@ -4,8 +4,8 @@ import Login from './components/Login';
 import Routines from './components/Routines';
 import './App.css';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-  import.meta.env.VITE_API_URL || 'http://localhost:3001';
+// URL forzada directamente al puerto 3001 para asegurar la conexión
+const API_URL = 'http://localhost:3001';
 
 async function sendRequest(endpoint, body) {
   try {
