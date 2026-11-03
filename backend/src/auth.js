@@ -47,8 +47,8 @@ router.post('/register', async (req, res) => {
 
     const normalizedEmail = email.trim().toLowerCase();
 
-    const [existing] = await pool.execute(
-      'SELECT id FROM users WHERE email = ?',
+    const { rows: existing } = await pool.query(
+      'SELECT id FROM users WHERE email = $1',
       [normalizedEmail]
     );
 
@@ -60,10 +60,11 @@ router.post('/register', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const [result] = await pool.execute(
+    const { rows: insertedUsers } = await pool.query(
       `INSERT INTO users
       (name, email, password_hash, age, gender, population, preferred_space, level)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING id`,
       [
         name.trim(),
         normalizedEmail,
@@ -79,14 +80,14 @@ router.post('/register', async (req, res) => {
     return res.status(201).json({
       message: 'Usuario registrado correctamente.',
       user: {
-        id: result.insertId,
+        id: insertedUsers[0].id,
         name: name.trim(),
         email: normalizedEmail,
         role: 'user'
       }
     });
   } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
+    if (error.code === '23505') {
       return res.status(409).json({
         error: 'Este correo ya está registrado.'
       });
@@ -116,10 +117,10 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    const [users] = await pool.execute(
+    const { rows: users } = await pool.query(
       `SELECT id, name, email, password_hash, role
        FROM users
-       WHERE email = ?`,
+       WHERE email = $1`,
       [email.trim().toLowerCase()]
     );
 

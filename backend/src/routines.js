@@ -75,25 +75,25 @@ router.get('/exercises', async (req, res) => {
     const values = [];
 
     if (space) {
-      conditions.push('space = ?');
       values.push(space);
+      conditions.push(`space = $${values.length}`);
     }
 
     if (level) {
-      conditions.push('level = ?');
       values.push(level);
+      conditions.push(`level = $${values.length}`);
     }
 
     if (category) {
-      conditions.push('category = ?');
       values.push(category);
+      conditions.push(`category = $${values.length}`);
     }
 
     const where = conditions.length
       ? `WHERE ${conditions.join(' AND ')}`
       : '';
 
-    const [exercises] = await pool.execute(
+    const { rows: exercises } = await pool.query(
       `SELECT id, name, description, category, space,
               level, muscle, video_url
        FROM exercises
@@ -166,22 +166,24 @@ router.post('/generate', async (req, res) => {
 
   try {
     const allowedLevels = levelOrder[level];
-    const placeholders = allowedLevels.map(() => '?').join(', ');
+    const levelPlaceholders = allowedLevels
+      .map((_, index) => `$${index + 3}`)
+      .join(', ');
 
-    const [availableExercises] = await pool.execute(
+    const { rows: availableExercises } = await pool.query(
       `SELECT id, name, category, space, level, muscle
        FROM exercises
-       WHERE space = ?
-         AND category = ?
-         AND level IN (${placeholders})
-       ORDER BY RAND()
+       WHERE space = $1
+         AND category = $2
+         AND level IN (${levelPlaceholders})
+       ORDER BY RANDOM()
        LIMIT 50`,
       [space, category, ...allowedLevels]
     );
 
     if (availableExercises.length === 0) {
       return res.status(422).json({
-        error: 'Todavía no hay ejercicios compatibles. Agrega ejercicios al catálogo de MySQL e inténtalo de nuevo.'
+        error: 'Todavía no hay ejercicios compatibles. Agrega ejercicios al catálogo e inténtalo de nuevo.'
       });
     }
 
@@ -197,8 +199,8 @@ router.post('/generate', async (req, res) => {
       Math.min(exerciseCount, availableExercises.length)
     );
 
-    connection = await pool.getConnection();
-    await connection.beginTransaction();
+    connection = await pool.connect();
+    await connection.query('BEGIN');
 
     const routineName =
       typeof name === 'string' && name.trim()
@@ -210,11 +212,12 @@ router.post('/generate', async (req, res) => {
         ? description.trim()
         : 'Rutina generada automáticamente según tus preferencias.';
 
-    const [routineResult] = await connection.execute(
+    const { rows: insertedRoutines } = await connection.query(
       `INSERT INTO routines
        (user_id, name, description, space, level, category,
         population, duration, is_public, is_generated)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, FALSE, TRUE)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, FALSE, TRUE)
+       RETURNING id`,
       [
         req.user.id,
         routineName,
@@ -227,15 +230,15 @@ router.post('/generate', async (req, res) => {
       ]
     );
 
-    const routineId = routineResult.insertId;
+    const routineId = insertedRoutines[0].id;
 
     for (let i = 0; i < selectedExercises.length; i++) {
       const exercise = selectedExercises[i];
 
-      await connection.execute(
+      await connection.query(
         `INSERT INTO routine_exercises
          (routine_id, exercise_id, position, sets, reps, rest_seconds)
-         VALUES (?, ?, ?, ?, ?, ?)`,
+         VALUES ($1, $2, $3, $4, $5, $6)`,
         [
           routineId,
           exercise.id,
@@ -247,7 +250,7 @@ router.post('/generate', async (req, res) => {
       );
     }
 
-    await connection.commit();
+    await connection.query('COMMIT');
 
     return res.status(201).json({
       message: 'Rutina generada y guardada correctamente.',
@@ -271,7 +274,11 @@ router.post('/generate', async (req, res) => {
     });
   } catch (error) {
     if (connection) {
-      await connection.rollback();
+      try {
+        await connection.query('ROLLBACK');
+      } catch {
+        // Preserve the original error.
+      }
     }
 
     console.error('Error al generar rutina:', error.message);
@@ -290,11 +297,11 @@ router.post('/generate', async (req, res) => {
 // Consultar las rutinas del usuario autenticado
 router.get('/mine', async (req, res) => {
   try {
-    const [routines] = await pool.execute(
+    const { rows: routines } = await pool.query(
       `SELECT id, name, description, space, level, category,
               population, duration, is_public, is_generated, created_at
        FROM routines
-       WHERE user_id = ?
+       WHERE user_id = $1
        ORDER BY created_at DESC`,
       [req.user.id]
     );
