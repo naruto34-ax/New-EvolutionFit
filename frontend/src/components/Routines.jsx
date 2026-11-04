@@ -1,5 +1,6 @@
 
 import { useState, useEffect } from 'react';
+import '../css/routines.css';
 
 const API_URL = 'http://localhost:3001';
 

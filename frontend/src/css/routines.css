@@ -1,0 +1,142 @@
+/* Contenedor principal de la sección de rutinas */
+.routines-page {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 80vh;
+  padding: 2rem 1rem;
+  background-color: #0d0f18;
+  color: #f8fafc;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Tarjeta contenedora */
+.routines-card {
+  background: #131722;
+  border: 1px solid #1e2638;
+  border-radius: 12px;
+  padding: 2rem;
+  width: 100%;
+  max-width: 700px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* Botón de volver y acciones */
+.routines-card button {
+  background: #1e2638;
+  color: #ffffff;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.routines-card button:hover {
+  background: #2a344a;
+}
+
+/* Títulos y textos */
+.routines-card h1 {
+  font-size: 1.8rem;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #ffffff;
+}
+
+.routines-card p {
+  color: #94a3b8;
+  margin-bottom: 1.5rem;
+}
+
+/* Formularios y selectores */
+.routines-card form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.routines-card label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #cbd5e1;
+}
+
+.routines-card select {
+  background: #1a2234;
+  border: 1px solid #2a344a;
+  color: #ffffff;
+  padding: 0.75rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.routines-card select:focus {
+  border-color: #6366f1;
+}
+
+/* Botón principal de generar */
+.routines-card form button[type="submit"] {
+  background: #4f46e5;
+  color: #ffffff;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.routines-card form button[type="submit"]:hover {
+  background: #4338ca;
+}
+
+/* Resultados y tarjetas de historial */
+.routine-result {
+  background: #1a2234;
+  border: 1px solid #2a344a;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.routine-result h2 {
+  font-size: 1.4rem;
+  color: #f1f5f9;
+  margin-bottom: 0.5rem;
+}
+
+.routine-result h3 {
+  font-size: 1.1rem;
+  color: #e2e8f0;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.routine-result ol {
+  padding-left: 1.25rem;
+  color: #cbd5e1;
+}
+
+.routine-result li {
+  margin-bottom: 0.75rem;
+}
+
+.routine-result article {
+  background: #131722;
+  border: 1px solid #2a344a;
+  padding: 1rem;
+  border-radius: 6px;
+  margin-top: 1rem;
+}
+
+/* Manejo de errores */
+.routine-error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  padding: 0.5rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}

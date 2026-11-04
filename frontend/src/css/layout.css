@@ -1,0 +1,65 @@
+/* ---------- Pie de página: logo y nombre alineados ---------- */
+.footer-brand {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.footer-brand-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.footer-logo {
+  width: 40px;
+  height: 40px;
+  object-fit: contain;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.footer-name {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.footer-brand p {
+  margin: 0;
+}
+
+/* En pantallas pequeñas el bloque va centrado */
+@media (max-width: 768px) {
+  .footer-brand {
+    align-items: center;
+    text-align: center;
+  }
+}
+
+/* ---------- Barra superior: logo y nombre alineados ---------- */
+.navbar .nav-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ---------- Botón del menú hamburguesa ---------- */
+.navbar .nav-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.navbar .nav-toggle:hover {
+  background: var(--card-bg2);
+}
+
+.navbar .nav-toggle i {
+  font-size: 1.2rem;
+}

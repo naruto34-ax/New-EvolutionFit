@@ -1,56 +1,49 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { getAllOrders, updateOrderStatus, nextStatuses, ORDER_STATUS } from '../services/orderService';
+import useAsync from '../hooks/useAsync';
 import StatusBadge from '../components/StatusBadge';
+import ConfirmModal from '../components/ConfirmModal';
+import { LoadingState, EmptyState, ErrorState } from '../components/StateViews';
 import { formatCOP } from '../utils/format';
 
 export default function AdminOrders() {
   const { user, addPoints } = useAuth();
   const { showToast } = useToast();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
-
   const isAdmin = user.role === 'admin';
 
-  useEffect(() => {
-    if (!isAdmin) return undefined;
-    let active = true;
-    getAllOrders().then((data) => {
-      if (active) {
-        setOrders(data);
-        setLoading(false);
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [isAdmin]);
+  const { data, setData, loading, error, reload } = useAsync(getAllOrders, { enabled: isAdmin });
+  const [filter, setFilter] = useState('all');
+  const [pendingCancel, setPendingCancel] = useState(null);
 
-  const visible = useMemo(
-    () => (filter === 'all' ? orders : orders.filter((o) => o.status === filter)),
-    [orders, filter]
-  );
+  const visible = useMemo(() => {
+    const list = data ?? [];
+    return filter === 'all' ? list : list.filter((o) => o.status === filter);
+  }, [data, filter]);
+
   const revenue = useMemo(
-    () => orders.filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + o.total, 0),
-    [orders]
+    () => (data ?? []).filter((o) => o.status !== 'cancelled').reduce((sum, o) => sum + o.total, 0),
+    [data]
   );
-  const toShip = orders.filter((o) => o.status === 'paid').length;
+  const totalOrders = data ? data.length : 0;
+  const toShip = data ? data.filter((o) => o.status === 'paid').length : 0;
 
-  async function handleChange(order, next) {
-    if (next === 'cancelled' && !window.confirm('¿Cancelar este pedido? Se devolverá el stock y se restarán los puntos.')) {
-      return;
-    }
+  async function applyChange(order, next) {
     try {
       const updated = await updateOrderStatus(order.id, next);
       if (next === 'cancelled') addPoints(order.userId, -order.pointsEarned);
-      setOrders((prev) => prev.map((o) => (o.id === updated.id ? updated : o)));
+      setData((prev) => (prev ?? []).map((o) => (o.id === updated.id ? updated : o)));
       showToast('Pedido actualizado', `${order.id}: ${ORDER_STATUS[next].label}`, 'success');
-    } catch (error) {
-      showToast('No se pudo actualizar', error.message, 'error');
+    } catch (err) {
+      showToast('No se pudo actualizar', err.message, 'error');
     }
+  }
+
+  function handleChange(order, next) {
+    if (next === 'cancelled') setPendingCancel(order);
+    else applyChange(order, next);
   }
 
   if (!isAdmin) {
@@ -73,7 +66,7 @@ export default function AdminOrders() {
       <div className="grid-3" style={{ marginBottom: '2rem' }}>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(108,99,255,0.15)', color: '#6C63FF' }}><i className="fas fa-shopping-bag"></i></div>
-          <div className="stat-info"><h3>{orders.length}</h3><p>Pedidos</p></div>
+          <div className="stat-info"><h3>{totalOrders}</h3><p>Pedidos</p></div>
         </div>
         <div className="stat-card">
           <div className="stat-icon" style={{ background: 'rgba(67,233,123,0.15)', color: '#43E97B' }}><i className="fas fa-coins"></i></div>
@@ -88,9 +81,20 @@ export default function AdminOrders() {
       <div className="filters-bar" style={{ marginBottom: '1.5rem' }}>
         <div className="filter-group">
           <div className="filter-btns">
-            <button className={`filter-btn ${filter === 'all' ? 'active' : ''}`} onClick={() => setFilter('all')}>Todos</button>
+            <button
+              className={`filter-btn ${filter === 'all' ? 'active' : ''}`}
+              onClick={() => setFilter('all')}
+              aria-pressed={filter === 'all'}
+            >
+              Todos
+            </button>
             {Object.entries(ORDER_STATUS).map(([key, info]) => (
-              <button key={key} className={`filter-btn ${filter === key ? 'active' : ''}`} onClick={() => setFilter(key)}>
+              <button
+                key={key}
+                className={`filter-btn ${filter === key ? 'active' : ''}`}
+                onClick={() => setFilter(key)}
+                aria-pressed={filter === key}
+              >
                 {info.label}
               </button>
             ))}
@@ -100,14 +104,34 @@ export default function AdminOrders() {
 
       <div className="card">
         {loading ? (
-          <div className="spinner"></div>
+          <LoadingState label="Cargando pedidos..." />
+        ) : error ? (
+          <ErrorState message={error} onRetry={() => reload()} />
         ) : visible.length === 0 ? (
-          <div className="empty-state"><i className="fas fa-shopping-bag"></i><h3>Sin pedidos</h3></div>
+          <EmptyState
+            icon="fas fa-shopping-bag"
+            title="Sin pedidos"
+            message={filter === 'all' ? 'Todavía no hay compras registradas' : 'No hay pedidos con este estado'}
+          >
+            {filter !== 'all' && (
+              <button className="btn btn-secondary" style={{ marginTop: '1rem' }} onClick={() => setFilter('all')}>
+                Ver todos
+              </button>
+            )}
+          </EmptyState>
         ) : (
           <div className="table-container">
             <table className="admin-table">
+              <caption className="sr-only">Pedidos de la tienda</caption>
               <thead>
-                <tr><th>ID</th><th>Usuario</th><th>Total</th><th>Estado</th><th>Fecha</th><th>Acciones</th></tr>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Usuario</th>
+                  <th scope="col">Total</th>
+                  <th scope="col">Estado</th>
+                  <th scope="col">Fecha</th>
+                  <th scope="col">Acciones</th>
+                </tr>
               </thead>
               <tbody>
                 {visible.map((o) => (
@@ -122,7 +146,7 @@ export default function AdminOrders() {
                     <td>
                       <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap', alignItems: 'center' }}>
                         {nextStatuses(o.status).length === 0 && (
-                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>—</span>
+                          <span style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>Sin acciones</span>
                         )}
                         {nextStatuses(o.status).map((next) => (
                           <button
@@ -142,6 +166,21 @@ export default function AdminOrders() {
           </div>
         )}
       </div>
+
+      {pendingCancel && (
+        <ConfirmModal
+          title="Cancelar pedido"
+          message={`¿Cancelar el pedido ${pendingCancel.id} de ${pendingCancel.userName}? Se devolverá el stock y se restarán ${pendingCancel.pointsEarned} puntos. Esta acción no se puede deshacer.`}
+          confirmLabel="Sí, cancelar pedido"
+          danger
+          onCancel={() => setPendingCancel(null)}
+          onConfirm={() => {
+            const order = pendingCancel;
+            setPendingCancel(null);
+            applyChange(order, 'cancelled');
+          }}
+        />
+      )}
     </div>
   );
 }

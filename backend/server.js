@@ -1,6 +1,10 @@
 
 require('dotenv').config();
 
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET es obligatorio. Defínelo en backend/.env');
+}
+
 const express = require('express');
 const cors = require('cors');
 const pool = require('./config/connection');
@@ -52,11 +56,11 @@ app.use((req, res) => {
 
 // Manejo general de errores
 app.use((err, req, res, next) => {
+  if (err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'El cuerpo de la petición no es un JSON válido' });
+  }
   console.error('Error del servidor:', err.message);
-
-  res.status(500).json({
-    error: 'Error interno del servidor'
-  });
+  res.status(500).json({ error: 'Error interno del servidor' });
 });
 
 // Iniciar servidor y comprobar conexión con PostgreSQL

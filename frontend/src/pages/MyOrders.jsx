@@ -1,27 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getOrdersByUser } from '../services/orderService';
+import useAsync from '../hooks/useAsync';
 import StatusBadge from '../components/StatusBadge';
+import { LoadingState, EmptyState, ErrorState } from '../components/StateViews';
 import { formatCOP } from '../utils/format';
 
 export default function MyOrders() {
   const { user } = useAuth();
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    let active = true;
-    getOrdersByUser(user.id).then((data) => {
-      if (active) {
-        setOrders(data);
-        setLoading(false);
-      }
-    });
-    return () => {
-      active = false;
-    };
-  }, [user.id]);
+  const fetchOrders = useCallback(() => getOrdersByUser(user.id), [user.id]);
+  const { data: orders, loading, error, reload } = useAsync(fetchOrders);
 
   return (
     <div className="page">
@@ -31,14 +20,13 @@ export default function MyOrders() {
       </div>
 
       {loading ? (
-        <div className="spinner"></div>
-      ) : orders.length === 0 ? (
-        <div className="empty-state">
-          <i className="fas fa-shopping-bag"></i>
-          <h3>Aún no tienes pedidos</h3>
-          <p>Cuando compres algo, aparecerá aquí</p>
+        <LoadingState label="Cargando tus pedidos..." />
+      ) : error ? (
+        <ErrorState message={error} onRetry={() => reload()} />
+      ) : !orders || orders.length === 0 ? (
+        <EmptyState icon="fas fa-shopping-bag" title="Aún no tienes pedidos" message="Cuando compres algo, aparecerá aquí">
           <Link to="/tienda" className="btn btn-primary" style={{ marginTop: '1rem' }}>Ir a la tienda</Link>
-        </div>
+        </EmptyState>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
           {orders.map((o) => (

@@ -1,54 +1,91 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import api from '../services/api';
 
-// TEMPORAL: usuarios de prueba hasta que llegue el login real (#3/#4)
-const DEMO_USERS = [
-  { id: 1, name: 'Admin', email: 'admin@evolutionfit.com', role: 'admin', points: 0 },
-  { id: 2, name: 'Coach Carlos', email: 'coach@evolutionfit.com', role: 'coach', points: 0 },
-  { id: 3, name: 'María García', email: 'maria@demo.com', role: 'user', points: 0 }
-];
+const TOKEN_KEY = 'ef_token';
+const USER_KEY = 'ef_user';
 
-const USERS_KEY = 'ef_dev_users';
-const CURRENT_KEY = 'ef_dev_user_id';
-
-function readUsers() {
+// Lee la fecha de vencimiento del token (sin verificarlo: eso lo hace el servidor)
+function tokenIsValid(token) {
   try {
-    const saved = JSON.parse(localStorage.getItem(USERS_KEY));
-    return Array.isArray(saved) && saved.length ? saved : DEMO_USERS;
+    const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    return !payload.exp || payload.exp * 1000 > Date.now();
   } catch {
-    return DEMO_USERS;
+    return false;
   }
 }
 
-function readCurrentId() {
-  const id = Number(localStorage.getItem(CURRENT_KEY));
-  return DEMO_USERS.some((u) => u.id === id) ? id : 3;
+function readSession() {
+  try {
+    const token = localStorage.getItem(TOKEN_KEY);
+    const user = JSON.parse(localStorage.getItem(USER_KEY));
+    if (token && user && tokenIsValid(token)) return { token, user };
+  } catch {
+    // sesión dañada: se descarta
+  }
+  localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(USER_KEY);
+  return { token: null, user: null };
 }
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
-  const [users, setUsers] = useState(readUsers);
-  const [currentId, setCurrentId] = useState(readCurrentId);
+  const [session, setSession] = useState(readSession);
 
-  const user = users.find((u) => u.id === currentId) ?? users[0];
-
-  const switchUser = useCallback((id) => {
-    localStorage.setItem(CURRENT_KEY, String(id));
-    setCurrentId(id);
+  const login = useCallback(async ({ email, password }) => {
+    try {
+      const { data } = await api.post('/auth/login', { email, password });
+      if (!data.token || !data.user) {
+        return { success: false, error: 'El servidor no devolvió los datos de la sesión.' };
+      }
+      localStorage.setItem(TOKEN_KEY, data.token);
+      localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+      setSession({ token: data.token, user: data.user });
+      return { success: true, user: data.user };
+    } catch (error) {
+      return { success: false, error: error.userMessage || 'No se pudo iniciar sesión.' };
+    }
   }, []);
 
+  const register = useCallback(async (form) => {
+    try {
+      const { data } = await api.post('/auth/register', {
+        name: form.name,
+        email: form.email,
+        age: form.age || null,
+        gender: form.gender || null,
+        population: form.population,
+        preferredSpace: form.preferredSpace,
+        level: form.level,
+        password: form.password
+      });
+      return { success: true, ...data };
+    } catch (error) {
+      return { success: false, error: error.userMessage || 'No se pudo registrar el usuario.' };
+    }
+  }, []);
+
+  const logout = useCallback(() => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
+    setSession({ token: null, user: null });
+  }, []);
+
+  // TEMPORAL: mientras los pagos sigan en localStorage. Con el backend de pagos,
+  // los puntos los suma el servidor y esta función se elimina.
   const addPoints = useCallback((userId, amount) => {
-    setUsers((prev) => {
-      const next = prev.map((u) => (u.id === userId ? { ...u, points: Math.max(0, u.points + amount) } : u));
-      localStorage.setItem(USERS_KEY, JSON.stringify(next));
-      return next;
+    setSession((prev) => {
+      if (!prev.user || prev.user.id !== userId) return prev;
+      const user = { ...prev.user, points: Math.max(0, (prev.user.points ?? 0) + amount) };
+      localStorage.setItem(USER_KEY, JSON.stringify(user));
+      return { ...prev, user };
     });
   }, []);
 
   const value = useMemo(
-    () => ({ user, users, switchUser, addPoints }),
-    [user, users, switchUser, addPoints]
+    () => ({ user: session.user, token: session.token, login, register, logout, addPoints }),
+    [session, login, register, logout, addPoints]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

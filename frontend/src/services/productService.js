@@ -11,7 +11,8 @@ function readStock() {
 }
 
 // Cuando exista el backend, esto pasa a: const { data } = await api.get('/products'); return data;
-export async function getProducts() {
+
+export async function getProducts() {  
   const stock = readStock();
   return PRODUCTS.map((p) => ({ ...p, stock: stock[p.id] ?? p.stock }));
 }
