@@ -9,6 +9,7 @@ import { HOME_PATH } from './config/navigation';
 import Store from './pages/Store';
 import MyOrders from './pages/MyOrders';
 import AdminOrders from './pages/AdminOrders';
+import LandingPage from './components/LandingPage';
 
 // Los componentes de login y registro piden navegar a 'login', 'register' o 'landing'
 const AUTH_PATHS = { login: '/login', register: '/registro', landing: '/login' };
@@ -61,14 +62,18 @@ function RoutinesPage() {
   return <Routines token={token} onBack={() => navigate(HOME_PATH)} />;
 }
 
-export default function App() {
+  export default function App() {
   return (
     <Routes>
+      {/* Portada Principal Pública (Landing Page) */}
+      <Route path="/" element={<LandingPage />} />
+
+      {/* Autenticación pública */}
       <Route path="/login" element={<PublicOnly><LoginPage /></PublicOnly>} />
       <Route path="/registro" element={<PublicOnly><RegisterPage /></PublicOnly>} />
 
+      {/* Rutas protegidas (dentro de ProtectedLayout) */}
       <Route element={<ProtectedLayout />}>
-        <Route path="/" element={<Navigate to={HOME_PATH} replace />} />
         <Route path="/tienda" element={<Store />} />
         <Route path="/mis-pedidos" element={<MyOrders />} />
         <Route path="/admin/pedidos" element={<AdminOrders />} />

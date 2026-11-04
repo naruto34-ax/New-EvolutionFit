@@ -1,6 +1,7 @@
 import { useState } from "react";
 import "../css/Login.css";
 
+
 function Login({ onLogin, onNavigate }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,6 +18,7 @@ function Login({ onLogin, onNavigate }) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+
 
     // Validaciones personalizadas sin alertas HTML5 nativas
     if (!email.trim()) {
@@ -183,7 +185,7 @@ function Login({ onLogin, onNavigate }) {
               </button>
             </p>
 
-            <button type="button" className="login-back" onClick={() => onNavigate?.("landing")}>
+            <button type="button" className="login-back" onClick={() => window.location.href = "/"}>
               ← Volver al inicio
             </button>
           </div>
