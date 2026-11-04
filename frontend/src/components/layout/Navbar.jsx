@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, NavLink } from 'react-router-dom';
+import { Link, NavLink, useNavigate } from 'react-router-dom'; // 1. Agregamos useNavigate
 import { useAuth } from '../../context/AuthContext';
 import { HOME_PATH, itemsForRole } from '../../config/navigation';
 
@@ -12,10 +12,20 @@ const ROLE_STYLE = {
 export default function Navbar() {
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const navigate = useNavigate(); // 2. Instanciamos la navegación
 
   const items = itemsForRole(user.role);
   const role = ROLE_STYLE[user.role] ?? ROLE_STYLE.user;
   const close = () => setOpen(false);
+
+  // 3. Manejador para cerrar sesión y redirigir a la portada
+  const handleLogout = () => {
+    close();
+    navigate('/');
+    setTimeout(() => {
+      logout(); 
+    }, 100);
+  };
 
   return (
     <nav
@@ -63,9 +73,10 @@ export default function Navbar() {
             {role.label}
           </span>
         </div>
-        {/* El botón aparece cuando el login real entregue la función logout */}
+
+        {/* Usamos handleLogout en lugar de logout directo */}
         {logout && (
-          <button className="btn-logout" onClick={logout} aria-label="Cerrar sesión">
+          <button className="btn-logout" onClick={handleLogout} aria-label="Cerrar sesión">
             <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
           </button>
         )}

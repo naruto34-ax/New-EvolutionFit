@@ -260,7 +260,7 @@ function Register({ onNavigate, onRegister }) {
               </button>
             </p>
 
-            <button type="button" className="register-back" onClick={() => onNavigate?.("landing")}>
+            <button type="button" className="register-back" onClick={() => window.location.href = "/"}>
               ← Volver al inicio
             </button>
           </div>
