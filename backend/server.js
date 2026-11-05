@@ -9,7 +9,7 @@ const cors = require('cors');
 const pool = require('./config/connection');
 const authRoutes = require('./src/auth');
 const routinesRoutes = require('./src/routines');
-const usersRoutes = require('./src/users'); 
+
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -26,6 +26,10 @@ app.use('/api/auth', authRoutes);
 
 // Rutas de rutinas y ejercicios
 app.use('/api/routines', routinesRoutes);
+
+app.use("/api/logros", logrosRouter);
+
+app.use("/api/orders", ordersRouter);
 
 // Ruta directa de respaldo para asegurar la asignación del coach sin fallos
 app.put('/api/users/assign-coach', (req, res) => {
