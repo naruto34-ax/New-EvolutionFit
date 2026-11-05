@@ -1,8 +1,7 @@
 import { useState } from 'react';
+import api from '../services/api'; // Ajusta esta ruta a donde guardaste tu archivo unificado api.js
 
-const API_URL = 'http://localhost:3001';
-
-export default function AssignCoach({ token }) {
+export default function AssignCoach() {
   const coaches = [
     { id: 'coach-cboom', name: 'CBoom' }
   ];
@@ -15,30 +14,22 @@ export default function AssignCoach({ token }) {
     e.preventDefault();
     if (!selectedCoach) return;
     
-    const activeToken = token || localStorage.getItem('token');
     setLoading(true);
     setMessage(null);
     
     try {
-      const response = await fetch(`${API_URL}/api/users/assign-coach`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${activeToken}`
-        },
-        body: JSON.stringify({ coachId: selectedCoach })
-      });
-
-      const data = await response.json();
+      // Usamos la instancia 'api'. El token y la URL base se inyectan automáticamente
+      const response = await api.put('/users/assign-coach', { coachId: selectedCoach });
       
-      if (response.ok && data.success) {
+      if (response.data.success) {
         setMessage('Coach asignado correctamente.');
       } else {
-        setMessage(data.error || 'No se pudo completar la asignación.');
+        setMessage('No se pudo completar la asignación.');
       }
     } catch (err) {
       console.error(err);
-      setMessage('Error de conexión con el servidor.');
+      // Aprovechamos el error personalizado que configuraste en tu interceptor
+      setMessage(err.userMessage || 'Error de conexión con el servidor.');
     } finally {
       setLoading(false);
     }
@@ -51,13 +42,12 @@ export default function AssignCoach({ token }) {
       borderRadius: '12px',
       boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
       color: '#fff',
-      marginBottom: '2rem',
-      width: '100%',
+      width: '320px', // Ancho fijo para que se vea bien como dropdown
       boxSizing: 'border-box'
     }}>
-      <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#38bdf8' }}>🏋️ Tu Entrenador Personal</h3>
+      <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.2rem', color: '#38bdf8' }}>🏋️ Tu Entrenador</h3>
       <p style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: '1rem' }}>
-        Entrenador asignado actualmente.
+        Selecciona tu coach personal.
       </p>
 
       <form onSubmit={handleAssign} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>

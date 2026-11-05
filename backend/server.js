@@ -9,6 +9,9 @@ const cors = require('cors');
 const pool = require('./config/connection');
 const authRoutes = require('./src/auth');
 const routinesRoutes = require('./src/routines');
+const logrosRouter = require('./src/achievements'); 
+const ordersRouter = require('./src/orders');
+const usersRoutes = require('./src/users');
 
 
 const app = express();

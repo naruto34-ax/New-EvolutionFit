@@ -12,6 +12,7 @@ import AdminOrders from './pages/AdminOrders';
 import LandingPage from './components/LandingPage';
 import SistemaLogros from "./components/SistemaLogros";
 import ProgressGallery from "./components/ProgressGallery";
+import AssignCoach from './components/AssignCoach';
 
 // Los componentes de login y registro piden navegar a 'login', 'register' o 'landing'
 const AUTH_PATHS = { login: '/login', register: '/registro', landing: '/login' };
@@ -82,6 +83,7 @@ function RoutinesPage() {
         <Route path="/rutinas" element={<RoutinesPage />} />
         <Route path="/logros" element={<SistemaLogros />} />
         <Route path="/progreso" element={<ProgressGallery />} />
+        <Route path="/mi-coach" element={<AssignCoach />} />
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>

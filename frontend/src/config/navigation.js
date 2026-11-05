@@ -7,7 +7,8 @@ export const NAV_ITEMS = [
   { to: '/admin/pedidos', label: 'Pedidos', icon: 'fas fa-clipboard-list', roles: ['admin'] },
   { to: '/rutinas', label: 'Rutinas', icon: 'fas fa-dumbbell', roles: ['user', 'coach', 'admin'] },
   { to: '/logros', label: 'Logros', icon: 'fas fa-trophy', roles: ['user', 'coach', 'admin'] },
-  { to: '/progreso', label: 'Progreso', icon: 'fas fa-camera', roles: ['user', 'coach', 'admin'] }
+  { to: '/progreso', label: 'Progreso', icon: 'fas fa-camera', roles: ['user', 'coach', 'admin'] },
+  { to: '/mi-coach', label: 'Mi Coach', icon: 'fas fa-user-ninja', roles: ['user', 'admin'] }
 ];
 
 

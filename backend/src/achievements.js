@@ -64,4 +64,5 @@ if (process.env.NODE_ENV !== "production") {
   });
 }
 
-module.exports = { router, registrarProgreso };
+module.exports = router;
+module.exports.registrarProgreso = registrarProgreso;
