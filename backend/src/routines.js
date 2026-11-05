@@ -1,4 +1,3 @@
-
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const pool = require('../config/connection');
@@ -15,7 +14,6 @@ const validCategories = [
   'calisthenics'
 ];
 
-// Verificar el token de inicio de sesión
 function authenticateToken(req, res, next) {
   const authorization = req.headers.authorization;
   const token = authorization?.startsWith('Bearer ')
@@ -44,31 +42,22 @@ function authenticateToken(req, res, next) {
   }
 }
 
-// Todas las rutas de este archivo requieren autenticación
 router.use(authenticateToken);
 
-// GET /api/routines/exercises
-// Consultar ejercicios disponibles con filtros opcionales
 router.get('/exercises', async (req, res) => {
   try {
     const { space, level, category } = req.query;
 
     if (space && !validSpaces.includes(space)) {
-      return res.status(400).json({
-        error: 'El espacio seleccionado no es válido.'
-      });
+      return res.status(400).json({ error: 'El espacio seleccionado no es válido.' });
     }
 
     if (level && !validLevels.includes(level)) {
-      return res.status(400).json({
-        error: 'El nivel seleccionado no es válido.'
-      });
+      return res.status(400).json({ error: 'El nivel seleccionado no es válido.' });
     }
 
     if (category && !validCategories.includes(category)) {
-      return res.status(400).json({
-        error: 'La categoría seleccionada no es válida.'
-      });
+      return res.status(400).json({ error: 'La categoría seleccionada no es válida.' });
     }
 
     const conditions = [];
@@ -108,15 +97,10 @@ router.get('/exercises', async (req, res) => {
     });
   } catch (error) {
     console.error('Error al consultar ejercicios:', error.message);
-
-    return res.status(500).json({
-      error: 'No se pudieron consultar los ejercicios.'
-    });
+    return res.status(500).json({ error: 'No se pudieron consultar los ejercicios.' });
   }
 });
 
-// POST /api/routines/generate
-// Generar y guardar una rutina automáticamente
 router.post('/generate', async (req, res) => {
   const {
     name,
@@ -133,9 +117,7 @@ router.post('/generate', async (req, res) => {
     !validLevels.includes(level) ||
     !validCategories.includes(category)
   ) {
-    return res.status(400).json({
-      error: 'Selecciona un espacio, nivel y categoría válidos.'
-    });
+    return res.status(400).json({ error: 'Selecciona un espacio, nivel y categoría válidos.' });
   }
 
   if (
@@ -143,17 +125,11 @@ router.post('/generate', async (req, res) => {
     Number(duration) < 10 ||
     Number(duration) > 120
   ) {
-    return res.status(400).json({
-      error: 'La duración debe estar entre 10 y 120 minutos.'
-    });
+    return res.status(400).json({ error: 'La duración debe estar entre 10 y 120 minutos.' });
   }
 
-  // Esta primera versión genera rutinas generales.
-  if (population !== 'general' && population !== 'joven'
-      && population !== 'adulto') {
-    return res.status(400).json({
-      error: 'Esta población requiere una selección de ejercicios específica que aún no está implementada.'
-    });
+  if (population !== 'general' && population !== 'joven' && population !== 'adulto') {
+    return res.status(400).json({ error: 'Esta población requiere una selección de ejercicios específica.' });
   }
 
   const levelOrder = {
@@ -183,12 +159,10 @@ router.post('/generate', async (req, res) => {
 
     if (availableExercises.length === 0) {
       return res.status(422).json({
-        error: 'Todavía no hay ejercicios compatibles. Agrega ejercicios al catálogo e inténtalo de nuevo.'
+        error: 'Todavía no hay ejercicios compatibles para esta combinación.'
       });
     }
 
-    // Aproximadamente un ejercicio por cada 8 minutos,
-    // con un mínimo de 3 y un máximo de 10.
     const exerciseCount = Math.min(
       10,
       Math.max(3, Math.round(Number(duration) / 8))
@@ -205,7 +179,7 @@ router.post('/generate', async (req, res) => {
     const routineName =
       typeof name === 'string' && name.trim()
         ? name.trim().slice(0, 150)
-        : `Rutina ${category} - ${space}`;
+        : `Rutina de ${category.toUpperCase()} (${space})`;
 
     const routineDescription =
       typeof description === 'string' && description.trim()
@@ -276,16 +250,10 @@ router.post('/generate', async (req, res) => {
     if (connection) {
       try {
         await connection.query('ROLLBACK');
-      } catch {
-        // Preserve the original error.
-      }
+      } catch {}
     }
-
     console.error('Error al generar rutina:', error.message);
-
-    return res.status(500).json({
-      error: 'No se pudo generar la rutina.'
-    });
+    return res.status(500).json({ error: 'No se pudo generar la rutina.' });
   } finally {
     if (connection) {
       connection.release();
@@ -293,29 +261,35 @@ router.post('/generate', async (req, res) => {
   }
 });
 
-// GET /api/routines/mine
-// Consultar las rutinas del usuario autenticado
-router.get('/mine', async (req, res) => {
+// GET /api/routines/mine - Historial con el coach dinámico correcto
+// GET /api/routines/mine - Historial con el nombre de CBoom por JOIN
+router.get('/mine', authenticateToken, async (req, res) => {
   try {
     const { rows: routines } = await pool.query(
-      `SELECT id, name, description, space, level, category,
-              population, duration, is_public, is_generated, created_at
-       FROM routines
-       WHERE user_id = $1
-       ORDER BY created_at DESC`,
+      `SELECT r.id, r.name, r.description, r.space, r.level, r.category,
+              r.population, r.duration, r.is_public, r.is_generated, r.created_at,
+              c.name AS coach_name, c.email AS coach_email
+       FROM routines r
+       JOIN users u ON u.id = r.user_id
+       LEFT JOIN coaches c ON c.id = u.coach_id
+       WHERE r.user_id = $1
+       ORDER BY r.created_at DESC`,
       [req.user.id]
     );
 
+    const routinesWithCoach = routines.map(r => ({
+      ...r,
+      coach_name: r.coach_name || 'Sin coach asignado',
+      coach_email: r.coach_email || ''
+    }));
+
     return res.json({
-      total: routines.length,
-      routines
+      total: routinesWithCoach.length,
+      routines: routinesWithCoach
     });
   } catch (error) {
     console.error('Error al consultar rutinas:', error.message);
-
-    return res.status(500).json({
-      error: 'No se pudieron consultar tus rutinas.'
-    });
+    return res.status(500).json({ error: 'No se pudieron consultar tus rutinas.' });
   }
 });
 

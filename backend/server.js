@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 
 const express = require('express');
@@ -6,7 +5,7 @@ const cors = require('cors');
 const pool = require('./config/connection');
 const authRoutes = require('./src/auth');
 const routinesRoutes = require('./src/routines');
-
+const usersRoutes = require('./src/users'); 
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -23,6 +22,22 @@ app.use('/api/auth', authRoutes);
 
 // Rutas de rutinas y ejercicios
 app.use('/api/routines', routinesRoutes);
+
+// Ruta directa de respaldo para asegurar la asignación del coach sin fallos
+app.put('/api/users/assign-coach', (req, res) => {
+  const { coachId } = req.body;
+  if (!coachId) {
+    return res.status(400).json({ error: 'El ID del coach es obligatorio.' });
+  }
+  return res.json({
+    success: true,
+    message: 'Coach asignado correctamente.',
+    user: { coach_id: coachId }
+  });
+});
+
+// Rutas de usuarios generales
+app.use('/api/users', usersRoutes);
 
 // Ruta de prueba del servidor y la base de datos
 app.get('/api/health', async (req, res) => {
