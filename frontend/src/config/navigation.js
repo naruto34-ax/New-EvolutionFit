@@ -5,8 +5,12 @@ export const NAV_ITEMS = [
   { to: '/tienda', label: 'Tienda', icon: 'fas fa-shopping-bag', roles: ['user', 'coach', 'admin'] },
   { to: '/mis-pedidos', label: 'Mis pedidos', icon: 'fas fa-receipt', roles: ['user', 'coach', 'admin'] },
   { to: '/admin/pedidos', label: 'Pedidos', icon: 'fas fa-clipboard-list', roles: ['admin'] },
-  { to: '/rutinas', label: 'Rutinas', icon: 'fas fa-dumbbell', roles: ['user', 'coach', 'admin'] }
+  { to: '/rutinas', label: 'Rutinas', icon: 'fas fa-dumbbell', roles: ['user', 'coach', 'admin'] },
+  { to: '/logros', label: 'Logros', icon: 'fas fa-trophy', roles: ['user', 'coach', 'admin'] },
+  { to: '/progreso', label: 'Progreso', icon: 'fas fa-camera', roles: ['user', 'coach', 'admin'] }
 ];
+
+
 
 // Títulos de páginas que no están en el menú (por ejemplo, '/perfil': 'Mi perfil')
 const EXTRA_TITLES = {};

@@ -1,6 +1,10 @@
 import { useState } from "react";
+import { useAuth } from "../context/AuthContext";
 import { Encabezado, Tabs, Badge, Barra, Vacio } from "./ui";
 import { useLogros } from "../hooks/useLogros";
+import "../css/evolution.css";
+
+
 
 const PUNTOS_POR_NIVEL = 100;
 const FILTROS = [["todos", "Todos"], ["logrados", "Logrados"], ["pendientes", "En curso"]];
@@ -10,7 +14,7 @@ function Anillo({ pct, completo }) {
   const r = 26, c = 2 * Math.PI * r;
   return (
     <svg className="ef-ring" width="64" height="64" viewBox="0 0 64 64" role="img" aria-label={`${pct}% completado`}>
-      <circle cx="32" cy="32" r={r} fill="none" stroke="#e6e9e5" strokeWidth="7" />
+      <circle cx="32" cy="32" r={r} fill="none" stroke="rgba(255,255,255,.12)" strokeWidth="7" />
       <circle cx="32" cy="32" r={r} fill="none" strokeWidth="7" strokeLinecap="round"
         stroke={completo ? "var(--ef-signal)" : "var(--ef-primary)"}
         strokeDasharray={c} strokeDashoffset={c * (1 - pct / 100)} transform="rotate(-90 32 32)" />
@@ -20,8 +24,9 @@ function Anillo({ pct, completo }) {
 }
 
 /** token: el JWT del usuario autenticado (el mismo que usa tu Login). */
-export default function SistemaLogros({ token, nombre = "Tu progreso" }) {
-  const { logros, cargando, error, recargar } = useLogros(token);
+export default function SistemaLogros({ nombre = "Tu progreso" }) {
+  const { token, user } = useAuth();
+  const { logros, cargando, error, recargar } = useLogros();
   const [filtro, setFiltro] = useState("todos");
 
   const lista = logros.map((l) => ({
@@ -70,7 +75,13 @@ export default function SistemaLogros({ token, nombre = "Tu progreso" }) {
           </div>
 
           {visibles.length === 0 ? (
-            <Vacio>Aún no hay logros en esta lista. Sigue entrenando.</Vacio>
+            <Vacio>
+              {filtro === "logrados"
+                ? "Todavía no has completado ningún logro. ¡Sigue entrenando!"
+                : filtro === "pendientes"
+                  ? "¡Completaste todos los logros! No te queda ninguno en curso."
+                  : "Aún no hay logros disponibles."}
+            </Vacio>
           ) : (
             <div className="ef-grid">
               {visibles.map((l) => (

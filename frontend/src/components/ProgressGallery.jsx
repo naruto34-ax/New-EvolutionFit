@@ -34,7 +34,7 @@ export default function ProgressGallery() {
 
   return (
     <div style={{ maxWidth: 760, margin: "24px auto", padding: 20 }}>
-      <h3 style={{ marginBottom: 16 }}>Fotos de progreso</h3>
+      <h3 style={{ marginBottom: 16, color: "#f1f2ff" }}>Fotos de progreso</h3>
 
       <div
         style={{
@@ -49,11 +49,7 @@ export default function ProgressGallery() {
           value={caption}
           onChange={(e) => setCaption(e.target.value)}
           placeholder="Título o descripción"
-          style={{
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #d1d5db",
-          }}
+          style={{ padding: 10, borderRadius: 10, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.04)", color: "#f1f2ff" }}
         />
 
         <input
@@ -61,25 +57,13 @@ export default function ProgressGallery() {
           value={imageUrl}
           onChange={(e) => setImageUrl(e.target.value)}
           placeholder="URL de la imagen"
-          style={{
-            padding: 10,
-            borderRadius: 8,
-            border: "1px solid #d1d5db",
-          }}
+          style={{ padding: 10, borderRadius: 10, border: "1px solid rgba(255,255,255,.12)", background: "rgba(255,255,255,.04)", color: "#f1f2ff" }}
         />
       </div>
 
       <button
         onClick={handleAddPhoto}
-        style={{
-          padding: "12px 18px",
-          border: "none",
-          borderRadius: 8,
-          background: "#16a34a",
-          color: "#fff",
-          cursor: "pointer",
-          marginBottom: 20,
-        }}
+        style={{ padding: "12px 18px", border: "none", borderRadius: 10, background: "linear-gradient(135deg,#6366f1,#8b5cf6)", color: "#fff", cursor: "pointer", marginBottom: 20 }}
       >
         Agregar foto
       </button>
@@ -94,12 +78,7 @@ export default function ProgressGallery() {
         {photos.map((photo) => (
           <div
             key={photo.id}
-            style={{
-              background: "#f9fafb",
-              borderRadius: 12,
-              overflow: "hidden",
-              border: "1px solid #e5e7eb",
-            }}
+            style={{ background: "rgba(255,255,255,.04)", borderRadius: 14, overflow: "hidden", border: "1px solid rgba(255,255,255,.10)" }}
           >
             <img
               src={photo.url}
@@ -112,7 +91,7 @@ export default function ProgressGallery() {
               }}
             />
             <div style={{ padding: 12 }}>
-              <strong>{photo.caption}</strong>
+              <strong style={{ color: "#f1f2ff" }}>{photo.caption}</strong>
             </div>
           </div>
         ))}

@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
-import { apiFetch } from "../services/api";
+import api from "../services/api";
 
-export function useLogros(token) {
+export function useLogros() {
   const [logros, setLogros] = useState([]);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
@@ -10,14 +10,14 @@ export function useLogros(token) {
     setCargando(true);
     setError(null);
     try {
-      const data = await apiFetch("/api/logros", { token, signal });
+      const { data } = await api.get("/logros", { signal });
       setLogros(data.logros);
     } catch (e) {
-      if (e.name !== "AbortError") setError(e.message);
+      if (e.code !== "ERR_CANCELED") setError(e.userMessage || e.message);
     } finally {
       if (!signal?.aborted) setCargando(false);
     }
-  }, [token]);
+  }, []);
 
   useEffect(() => {
     const control = new AbortController();

@@ -1,6 +1,6 @@
 const express = require("express");
 const pool = require("../config/connection");               // AJUSTAR: tu pool de Neon (ver paso 3 de la guía)
-const { verificarToken } = require("./auth");       // AJUSTAR: tu middleware JWT (ver paso 4 de la guía)
+const { authenticateToken: verificarToken } = require("./middleware");      // AJUSTAR: tu middleware JWT (ver paso 4 de la guía)
 
 const router = express.Router();
 

@@ -10,6 +10,9 @@ const cors = require('cors');
 const pool = require('./config/connection');
 const authRoutes = require('./src/auth');
 const routinesRoutes = require('./src/routines');
+const { router: logrosRouter } = require("./src/achievements");
+const { router: ordersRouter } = require("./src/orders");
+
 
 
 const app = express();
@@ -27,6 +30,11 @@ app.use('/api/auth', authRoutes);
 
 // Rutas de rutinas y ejercicios
 app.use('/api/routines', routinesRoutes);
+
+// Rutas de logros
+app.use("/api/logros", logrosRouter);
+
+app.use("/api/orders", ordersRouter);
 
 // Ruta de prueba del servidor y la base de datos
 app.get('/api/health', async (req, res) => {
